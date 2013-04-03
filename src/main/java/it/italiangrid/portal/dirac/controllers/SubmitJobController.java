@@ -1,9 +1,7 @@
 package it.italiangrid.portal.dirac.controllers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,9 +12,9 @@ import java.util.List;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
+import javax.portlet.PortletConfig;
 
 import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
-import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.model.Jdl;
 import it.italiangrid.portal.dirac.util.DiracUtil;
 
@@ -27,10 +25,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 
@@ -112,29 +111,65 @@ public class SubmitJobController {
 		            
 		            if (parameter.startsWith("uploadFile"))
 		            {
+		            	
 		                
 		                
 		                String fileName = uploadRequest.getFileName(parameter);
+		                log.info(parameter +" = "+fileName);
 		                
 		                if(!fileName.isEmpty()){
+		                	
+		                	log.info("Uploading " + fileName);
 		                
-		                	tempFile = uploadRequest.getFile(parameter);
+		                	tempFile = uploadRequest.getFile(parameter, true);
+		                	
+		                	log.info("temp file " + tempFile.getAbsolutePath());
 		                	
 			                File destination = new File(path + "/" + fileName);
+			                
+			                log.info("destination file " + destination.getAbsolutePath());
 			                
 			                FileUtil.copyFile(tempFile, destination);
 			                
 			                tempFile.delete();
-			 
+		                	
 			                inputSandbox.add(path+"/"+fileName);
+			                
 			             }
 		            }else{
-		            	 String value = uploadRequest.getParameter(parameter);
-				            
-				         log.info(parameter +" = "+value);
-				         
-				         
-				         jdl.setParameter(parameter, value);
+		            	
+		            	
+		            	if(parameter.equals("executableFile")){
+		            		 String fileName = uploadRequest.getFileName(parameter);
+				                log.info(parameter +" = "+fileName);
+				                
+				                if(!fileName.isEmpty()){
+				                	
+				                	log.info("Uploading " + fileName);
+				                
+				                	tempFile = uploadRequest.getFile(parameter, true);
+				                	
+				                	log.info("temp file " + tempFile.getAbsolutePath());
+				                	
+					                File destination = new File(path + "/" + fileName);
+					                
+					                log.info("destination file " + destination.getAbsolutePath());
+					                
+					                FileUtil.copyFile(tempFile, destination);
+					                
+					                tempFile.delete();
+				                	
+					                inputSandbox.add(path+"/"+fileName);
+					                jdl.setExecutable(fileName);
+					                
+					             }
+		            	} else{
+			            	String value = uploadRequest.getParameter(parameter);
+					          
+			            	log.info(parameter +" = "+value);
+					        
+					        jdl.setParameter(parameter, value);
+		            	}
 		            }
 		        }
 		        
@@ -179,23 +214,17 @@ public class SubmitJobController {
 				
 			}
 			
+			SessionMessages.add(request, "submit-successufully");
 			
 			return;
 
-		} catch (PortalException e) {
-			e.printStackTrace();
-		} catch (SystemException e) {
-			e.printStackTrace();
-		} catch (DiracException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		SessionErrors.add(request, "submit-error");
+		PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
+		SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
 		
 		response.setRenderParameter("myaction", "showSubmitJob");
 		request.setAttribute("jdl", jdl);

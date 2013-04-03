@@ -10,8 +10,6 @@ import it.italiangrid.portal.dbapi.services.UserInfoService;
 import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.db.domain.Jobs;
 import it.italiangrid.portal.dirac.db.service.JobsService;
-import it.italiangrid.portal.dirac.exception.DiracException;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,8 +17,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 
@@ -81,11 +77,7 @@ public class HomeController {
 			
 //			return "home";
 
-		} catch (PortalException e) {
-			e.printStackTrace();
-		} catch (SystemException e) {
-			e.printStackTrace();
-		} catch (DiracException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -108,11 +100,9 @@ public class HomeController {
 			
 //			return "home";
 
-		} catch (PortalException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		} catch (SystemException e) {
-			e.printStackTrace();
-		} 
+		}
 		
 		return null;
 	}

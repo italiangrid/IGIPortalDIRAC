@@ -21,10 +21,14 @@ public class Jdl {
 	private List<String> parameters;
 	private String parameterStart;
 	private String parameterStep;
-	private static List<String> parameterNames = Arrays.asList(new String[]{ "jobName", "executable", "arguments",
+	private String cpuNumber;
+	private String hostNumber;
+	private String wholeNodes;
+	private String smpGranularity;
+	private List<String> parameterNames = Arrays.asList(new String[]{ "jobName", "executable", "arguments",
 		"inputSandbox", "outputSandboxRequest", "outputSandbox", "outputSandboxDestUri", "stdOutput", "stdError",
 		"inputData", "outputSE", "outputData", "outputPath", "parameters", "parameterStart",
-		"parameterStep"});
+		"parameterStep", "cpuNumber", "hostNumber", "wholeNodes", "smpGranularity"});
 
 	/**
 	 * Default constructor.
@@ -38,11 +42,13 @@ public class Jdl {
 	}
 
 	/**
+	 * 
 	 * @param jobName
 	 * @param executable
 	 * @param arguments
 	 * @param inputSandbox
 	 * @param outputSandbox
+	 * @param outputSandboxDestUri
 	 * @param stdOutput
 	 * @param stdError
 	 * @param inputData
@@ -52,6 +58,10 @@ public class Jdl {
 	 * @param parameters
 	 * @param paramenterStart
 	 * @param parameterStep
+	 * @param cpuNumber
+	 * @param hostNumber
+	 * @param wholeNodes
+	 * @param smpGranularity
 	 */
 	public Jdl(String jobName, String executable, String arguments,
 			List<String> inputSandbox, List<String> outputSandbox,
@@ -59,7 +69,8 @@ public class Jdl {
 			String stdError, List<String> inputData, String outputSE,
 			List<List<String>> outputData, String outputPath,
 			List<String> parameters, String paramenterStart,
-			String parameterStep) {
+			String parameterStep, String cpuNumber, String hostNumber,
+			String wholeNodes, String smpGranularity) {
 		super();
 		this.jobName = jobName;
 		this.executable = executable;
@@ -76,6 +87,10 @@ public class Jdl {
 		this.parameters = parameters;
 		this.parameterStart = paramenterStart;
 		this.parameterStep = parameterStep;
+		this.cpuNumber = cpuNumber;
+		this.hostNumber = hostNumber;
+		this.wholeNodes = wholeNodes;
+		this.smpGranularity = smpGranularity;
 	}
 
 	/**
@@ -318,6 +333,62 @@ public class Jdl {
 		this.parameterStep = parameterStep;
 	}
 
+	/**
+	 * @return the cpuNumber
+	 */
+	public String getCpuNumber() {
+		return cpuNumber;
+	}
+
+	/**
+	 * @param cpuNumber the cpuNumber to set
+	 */
+	public void setCpuNumber(String cpuNumber) {
+		this.cpuNumber = cpuNumber;
+	}
+
+	/**
+	 * @return the hostNumber
+	 */
+	public String getHostNumber() {
+		return hostNumber;
+	}
+
+	/**
+	 * @param hostNumber the hostNumber to set
+	 */
+	public void setHostNumber(String hostNumber) {
+		this.hostNumber = hostNumber;
+	}
+
+	/**
+	 * @return the wholeNode
+	 */
+	public String getWholeNodes() {
+		return wholeNodes;
+	}
+
+	/**
+	 * @param wholeNode the wholeNode to set
+	 */
+	public void setWholeNodes(String wholeNodes) {
+		this.wholeNodes = wholeNodes;
+	}
+
+	/**
+	 * @return the smpGranularity
+	 */
+	public String getSmpGranularity() {
+		return smpGranularity;
+	}
+
+	/**
+	 * @param smpGranularity the smpGranularity to set
+	 */
+	public void setSmpGranularity(String smpGranularity) {
+		this.smpGranularity = smpGranularity;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -332,7 +403,7 @@ public class Jdl {
 		if (executable != null) {
 			string += "Executable = \"" + executable + "\";\n";
 		}
-		if (arguments != null) {
+		if (arguments != null && !arguments.isEmpty()) {
 			string += "Arguments = \"" + arguments + "\";\n";
 		}
 		if (stdOutput != null) {
@@ -426,12 +497,26 @@ public class Jdl {
 			}
 			string += "OutputSE = \"" + outputSE + "\";\n";
 		}
+		if (cpuNumber != null && !cpuNumber.isEmpty()) {
+			string += "CPUNumber = " + cpuNumber + ";\n";
+		}
+		if (hostNumber != null && !hostNumber.isEmpty()) {
+			string += "HostNumber = " + hostNumber + ";\n";
+		}
+		if (wholeNodes != null && !wholeNodes.isEmpty()) {
+			string += "WholeNodes = " + wholeNodes + ";\n";
+		}
+		if (smpGranularity != null && !smpGranularity.isEmpty()) {
+			string += "SMPGranularity = \"" + smpGranularity + "\";\n";
+		}
 
 		return string;
 	}
 
+	
 	public void setParameter(String parameter, Object value) {
 		int index = parameterNames.indexOf(parameter);
+		System.out.println("Index of "+parameter+" = " + index);
 		switch(index){
 		case 0: this.jobName = (String) value; break;
 		case 1: this.executable = (String) value; break;
@@ -449,8 +534,13 @@ public class Jdl {
 //		case 13: this.parameters = (List<String>) value; break;
 		case 14: this.parameterStart = (String) value; break;
 		case 15: this.parameterStep = (String) value; break;
+		case 16: this.cpuNumber = (String) value; break;
+		case 17: this.hostNumber = (String) value; System.out.println("hostNumber: " + hostNumber); break;
+		case 18: this.wholeNodes = (String) value; System.out.println("wholeNodes: " + wholeNodes); break;
+		case 19: this.smpGranularity = (String) value; break;
 		
 		}
+		System.out.println("Ci sono!!");
 	}
 
 }

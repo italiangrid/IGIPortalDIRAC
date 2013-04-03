@@ -1,15 +1,18 @@
 package it.italiangrid.portal.dirac.controllers;
 
 import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
-import it.italiangrid.portal.dirac.exception.DiracException;
 import javax.portlet.ActionRequest;
+import javax.portlet.PortletConfig;
+
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 
@@ -36,17 +39,16 @@ public class JobActionController {
 				DiracAdminUtil util = new DiracAdminUtil();
 				util.getRescheduleJob(userPath, jobId);
 				
+				SessionMessages.add(request, "resheduling-successufully");
+				return;
 			}
-		} catch (PortalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (DiracException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		SessionErrors.add(request, "rescheduling-error");
+		PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
+		SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
 
 	}
 	
@@ -65,17 +67,55 @@ public class JobActionController {
 				DiracAdminUtil util = new DiracAdminUtil();
 				util.getDeleteJob(userPath, jobId);
 				
+				SessionMessages.add(request, "deleting-successufully");
+				return;
+				
 			}
-		} catch (PortalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (DiracException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		SessionErrors.add(request, "deleting-error");
+		PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
+		SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
+
+	}
+	
+	@ActionMapping(params = "myaction=deleteMultipleJob")
+	public void getDeleteMultipleJob(@RequestParam int[] jobToDel, ActionRequest request){
+		
+		
+		try {
+			User user = PortalUtil.getUser(request);
+			if (user != null) {
+				
+				for(int jobId : jobToDel){
+					log.info("Delete job: " + jobId);
+					
+					String userPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId();
+					
+					DiracAdminUtil util = new DiracAdminUtil();
+					util.getDeleteJob(userPath, jobId);
+				}
+				
+				SessionMessages.add(request, "deleting-successufully");
+				return;
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		SessionErrors.add(request, "deleting-error");
+		PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
+		SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
+
+	}
+	
+	@ActionMapping(params = "myaction=goHome")
+	public void goHome(){
+		
+		return;
 
 	}
 	
