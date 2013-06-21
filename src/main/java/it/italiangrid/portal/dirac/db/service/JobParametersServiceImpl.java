@@ -2,6 +2,7 @@ package it.italiangrid.portal.dirac.db.service;
 
 import it.italiangrid.portal.dirac.db.dao.generic.JobParametersDAO;
 import it.italiangrid.portal.dirac.db.domain.JobParameters;
+import it.italiangrid.portal.dirac.db.domain.JobParametersId;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class JobParametersServiceImpl implements JobParametersService {
 	}
 
 	@Transactional
-	public JobParameters findById(Integer id) {
+	public JobParameters findById(JobParametersId id) {
 		log.debug("getting JobParameters instance with id: " + id);
 		return jobParametersDAO.findById(id,false);
 	}

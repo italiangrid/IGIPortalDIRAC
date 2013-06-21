@@ -59,7 +59,7 @@
 	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager" 
        			p:sessionFactory-ref="sessionFactory" />
     
-    <!-- DIRAC sessionFactory -->
+    <!-- DIRAC sessionFactory JobDB-->
     <bean id="sessionFactoryDirac" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean"
 				 p:dataSource-ref="dataSourceDirac"
 				 p:configLocation="${hibernate.config}" >
@@ -88,5 +88,35 @@
 	<!-- Declare a transaction manager-->
 	<bean id="transactionManagerDirac" class="org.springframework.orm.hibernate3.HibernateTransactionManager" 
        			p:sessionFactory-ref="sessionFactoryDirac" />
+       			
+       			
+    <!-- DIRAC sessionFactory  ProxyDB-->
+    <bean id="sessionFactoryDirac2" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean"
+				 p:dataSource-ref="dataSourceDirac2"
+				 p:configLocation="${hibernate.config}" >
+		<property name="annotatedClasses">
+     <list>
+       <value>it.italiangrid.portal.dirac.db.domain.Proxies</value>
+       <value>it.italiangrid.portal.dirac.db.domain.ProxiesId</value>
+     </list>
+   </property> 
+	</bean>
+	
+	<!-- Declare a datasource that has pooling capabilities-->	 
+	<bean id="dataSourceDirac2" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+				destroy-method="close"
+				p:driverClass="${app3.jdbc.driverClassName}"
+				p:jdbcUrl="${app3.jdbc.url}"
+				p:user="${app3.jdbc.username}"
+				p:password="${app3.jdbc.password}"
+				p:acquireIncrement="5"
+				p:idleConnectionTestPeriod="60"
+				p:maxPoolSize="3000"
+				p:maxStatements="50"
+				p:minPoolSize="5"/>
+
+	<!-- Declare a transaction manager-->
+	<bean id="transactionManagerDirac2" class="org.springframework.orm.hibernate3.HibernateTransactionManager" 
+       			p:sessionFactory-ref="sessionFactoryDirac2" />
   
 </beans>

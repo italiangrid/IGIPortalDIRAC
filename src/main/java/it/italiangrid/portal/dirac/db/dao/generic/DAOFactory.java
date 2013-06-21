@@ -34,5 +34,6 @@ public abstract class DAOFactory {
     public abstract JobsDAO getJobDAO();
     public abstract JobJdlsDAO getJobJdlsDAO();
     public abstract JobParametersDAO getJobParametersDAO();
+    public abstract ProxiesDAO getProxiesDAO();
 	
 }

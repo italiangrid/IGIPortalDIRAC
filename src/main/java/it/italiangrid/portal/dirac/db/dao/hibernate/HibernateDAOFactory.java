@@ -9,6 +9,7 @@ import it.italiangrid.portal.dirac.db.dao.generic.DAOFactory;
 import it.italiangrid.portal.dirac.db.dao.generic.JobsDAO;
 import it.italiangrid.portal.dirac.db.dao.generic.JobJdlsDAO;
 import it.italiangrid.portal.dirac.db.dao.generic.JobParametersDAO;
+import it.italiangrid.portal.dirac.db.dao.generic.ProxiesDAO;
 
 public class HibernateDAOFactory extends DAOFactory {
 
@@ -50,6 +51,12 @@ public class HibernateDAOFactory extends DAOFactory {
 	public JobParametersDAO getJobParametersDAO() {
 		// TODO Auto-generated method stub
 		return (JobParametersDAO) instantiateDAO(JobParametersDAO.class);
+	}
+	
+	@Override
+	public ProxiesDAO getProxiesDAO() {
+		// TODO Auto-generated method stub
+		return (ProxiesDAO) instantiateDAO(ProxiesDAO.class);
 	}
 
 	// Inline concrete DAO implementations with no business-related data access

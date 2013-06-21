@@ -9,7 +9,10 @@ import it.italiangrid.portal.dbapi.services.CertificateService;
 import it.italiangrid.portal.dbapi.services.UserInfoService;
 import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.db.domain.Jobs;
+import it.italiangrid.portal.dirac.db.domain.Proxies;
 import it.italiangrid.portal.dirac.db.service.JobsService;
+import it.italiangrid.portal.dirac.db.service.ProxiesService;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,6 +51,9 @@ public class HomeController {
 	@Autowired
 	private CertificateService certificateService;
 	
+	@Autowired
+	private ProxiesService proxiesService;
+	
 	/**
 	 * Display the home page.
 	 * 
@@ -79,6 +85,12 @@ public class HomeController {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		
+		List<Proxies> proxies = proxiesService.getAllProxies();
+		
+		for(Proxies p: proxies){
+			log.info("-----> "+ p.getUserName() + " - " + p.getId().getUserDn() + " - " + p.getId().getUserGroup());
 		}
 		
 		return "home";
