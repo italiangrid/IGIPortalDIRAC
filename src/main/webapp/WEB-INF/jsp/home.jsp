@@ -362,7 +362,7 @@
 								<portlet:param name="myaction" value="getJDL"/>
 								<portlet:param name="jobId" value="${job.jobId }"/>
 							</portlet:renderURL>
-					<a href="#" onclick="${getJdlURLonName}">${job.jobName }</a>
+					<a href="#" onclick="$(this).modal3({width:600, height:450, message:true, src: '${getJdlURLonName}'}).open();">${job.jobName }</a>
 					</liferay-ui:search-container-column-text>
 					<liferay-ui:search-container-column-text name="Submission Time"
 						property="submissionTime" />	

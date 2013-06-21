@@ -139,13 +139,13 @@ public class SubmitJobController {
 		            }else{
 		            	
 		            	
-		            	if(parameter.equals("executableFile")){
+		            	if(parameter.contains("executableFile")){
 		            		 String fileName = uploadRequest.getFileName(parameter);
 				                log.info(parameter +" = "+fileName);
 				                
 				                if(!fileName.isEmpty()){
 				                	
-				                	log.info("Uploading " + fileName);
+				                	log.info("Uploading exe file: " + fileName);
 				                
 				                	tempFile = uploadRequest.getFile(parameter, true);
 				                	
