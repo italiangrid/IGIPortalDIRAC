@@ -108,6 +108,12 @@
 			<portlet:param name="myaction" value="submitJob" />
 		</portlet:actionURL>
 		
+		<jsp:useBean id="vos"
+				type="java.util.List<it.italiangrid.portal.dbapi.domain.Vo>"
+				scope="request" />
+		
+		
+		
 		<aui:form name="newJdl" action="${submitUrl }" commandName="jdl" enctype="multipart/form-data">
 			<div id="myJdl">
 				<aui:fieldset label="JDL">
@@ -116,6 +122,20 @@
 						<aui:input type="text" id="executable" label="Executable" name="executable" value="${jdl.executable }"/>
 					</div>
 					<aui:input type="text" label="Arguments" name="arguments" value="${jdl.arguments }"/>
+					
+					<select name="vo">
+					
+						<c:forEach var="vo" items="${vos }">
+							<c:if test="${vo.vo == defaultVo }">
+								<option selected="true" value="${vo.vo }">${vo.vo } (Default)</option>
+							</c:if>
+							<c:if test="${vo.vo != defaultVo }">
+								<option value="${vo.vo }">${vo.vo }</option>
+							</c:if>
+						</c:forEach>
+					
+					</select>
+					
 					<div id="stdOutputDiv" style="display: none;">
 						<aui:input type="text" label="Standard Output" name="stdOutput" value="${jdl.stdOutput }"/>
 					</div>

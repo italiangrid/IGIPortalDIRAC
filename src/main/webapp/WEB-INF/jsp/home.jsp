@@ -120,7 +120,7 @@
 					$close = jQuery('<a class="' + options.closeClassName + '"></a>');
 					$close.appendTo($modal);
 
-					var overlayOpacity = _getOpacity($overlay.not('iframe')) || options.overlayOpacity;
+					var overlayOpacity = _getOpacity3($overlay.not('iframe')) || options.overlayOpacity;
 					$overlay.fadeTo(0, 0).show().not('iframe').fadeTo(_settings3.fadeInSpeed, overlayOpacity);
 					$modal.fadeIn(_settings3.fadeInSpeed);
 					
@@ -292,6 +292,8 @@
 	
 		<liferay-ui:success key="submit-successufully"
 			message="submit-successufully" />
+			<liferay-ui:success key="upload-successufully"
+			message="upload-successufully" />
 		<liferay-ui:success key="resheduling-successufully"
 			message="resheduling-successufully" />
 		<liferay-ui:success key="deleting-successufully"

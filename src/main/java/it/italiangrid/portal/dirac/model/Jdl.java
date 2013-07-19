@@ -25,10 +25,11 @@ public class Jdl {
 	private String hostNumber;
 	private String wholeNodes;
 	private String smpGranularity;
+	private String vo;
 	private List<String> parameterNames = Arrays.asList(new String[]{ "jobName", "executable", "arguments",
 		"inputSandbox", "outputSandboxRequest", "outputSandbox", "outputSandboxDestUri", "stdOutput", "stdError",
 		"inputData", "outputSE", "outputData", "outputPath", "parameters", "parameterStart",
-		"parameterStep", "cpuNumber", "hostNumber", "wholeNodes", "smpGranularity"});
+		"parameterStep", "cpuNumber", "hostNumber", "wholeNodes", "smpGranularity", "vo"});
 
 	/**
 	 * Default constructor.
@@ -70,7 +71,7 @@ public class Jdl {
 			List<List<String>> outputData, String outputPath,
 			List<String> parameters, String paramenterStart,
 			String parameterStep, String cpuNumber, String hostNumber,
-			String wholeNodes, String smpGranularity) {
+			String wholeNodes, String smpGranularity, String vo) {
 		super();
 		this.jobName = jobName;
 		this.executable = executable;
@@ -91,6 +92,7 @@ public class Jdl {
 		this.hostNumber = hostNumber;
 		this.wholeNodes = wholeNodes;
 		this.smpGranularity = smpGranularity;
+		this.vo = vo;
 	}
 
 	/**
@@ -389,6 +391,20 @@ public class Jdl {
 		this.smpGranularity = smpGranularity;
 	}
 
+	/**
+	 * @return the vo
+	 */
+	public String getVo() {
+		return vo;
+	}
+
+	/**
+	 * @param vo the vo to set
+	 */
+	public void setVo(String vo) {
+		this.vo = vo;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -405,6 +421,9 @@ public class Jdl {
 		}
 		if (arguments != null && !arguments.isEmpty()) {
 			string += "Arguments = \"" + arguments + "\";\n";
+		}
+		if (vo != null && !vo.isEmpty()) {
+			string += "VirtualOrganization = \"" + vo + "\";\n";
 		}
 		if (stdOutput != null) {
 			string += "StdOutput = \"" + stdOutput + "\";\n";
@@ -538,6 +557,7 @@ public class Jdl {
 		case 17: this.hostNumber = (String) value; System.out.println("hostNumber: " + hostNumber); break;
 		case 18: this.wholeNodes = (String) value; System.out.println("wholeNodes: " + wholeNodes); break;
 		case 19: this.smpGranularity = (String) value; break;
+		case 20: this.vo = (String) value; break;
 		
 		}
 		System.out.println("Ci sono!!");

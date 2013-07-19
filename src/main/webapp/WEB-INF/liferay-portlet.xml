@@ -6,7 +6,10 @@
 		<portlet-name>IGIPortalDIRAC</portlet-name>
 		<instanceable>true</instanceable>
 		<header-portlet-css>/css/main.css</header-portlet-css>
-		<footer-portlet-javascript>/js/main.js</footer-portlet-javascript>
+		<header-portal-javascript>/IGIPortalDIRAC-0.0.1/js/jquery-1.6.1.min.js</header-portal-javascript>
+		<header-portal-javascript>/IGIPortalDIRAC-0.0.1/js/jquery-ui.min.js</header-portal-javascript>
+		<footer-portal-javascript>/IGIPortalDIRAC-0.0.1/js/jquery.tooltip.js</footer-portal-javascript>
+		<footer-portal-javascript>/IGIPortalDIRAC-0.0.1/js/main.js</footer-portal-javascript>
 	</portlet>
 	<role-mapper>
 		<role-name>administrator</role-name>

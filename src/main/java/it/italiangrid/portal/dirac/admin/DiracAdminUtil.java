@@ -3,6 +3,7 @@ package it.italiangrid.portal.dirac.admin;
 import it.italiangrid.portal.dbapi.domain.UserInfo;
 import it.italiangrid.portal.dbapi.services.CertificateService;
 import it.italiangrid.portal.dirac.exception.DiracException;
+import it.italiangrid.portal.dirac.util.DiracConfig;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,7 +26,7 @@ public class DiracAdminUtil {
 		
 		log.info("Execute command: " + cmd);
 		
-		File path = new File(System.getProperty("java.io.tmpdir") + "/diracAdmin");
+		File path = new File(System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir"));
 		
 		try {
 			Process p = Runtime.getRuntime().exec(cmd, null, path);
@@ -83,7 +84,7 @@ public class DiracAdminUtil {
 		
 		log.info("Execute command: " + logcmd);
 		
-		File path = new File(System.getProperty("java.io.tmpdir") + "/diracAdmin");
+		File path = new File(System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir"));
 		
 		try {
 			Process p = Runtime.getRuntime().exec(cmd, null, path);
@@ -137,32 +138,8 @@ public class DiracAdminUtil {
 		log.info("Execute command: " + logcmd);
 		
 		try {
-			Process p = Runtime.getRuntime().exec(cmd, null, exePath);
-			InputStream stdout = p.getInputStream();
-			InputStream stderr = p.getErrorStream();
+			execute(cmd, exePath);
 
-			BufferedReader output = new BufferedReader(new InputStreamReader(
-					stdout));
-			String line = null;
-
-			while (((line = output.readLine()) != null)) {
-
-				log.info("[Stdout] " + line);
-
-			}
-			output.close();
-
-			BufferedReader brCleanUp = new BufferedReader(
-					new InputStreamReader(stderr));
-			while ((line = brCleanUp.readLine()) != null) {
-
-				log.error("[Stderr] " + line);
-
-			}
-
-			brCleanUp.close();
-			
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new DiracException("userAdd-execution-error");
@@ -176,32 +153,8 @@ public class DiracAdminUtil {
 		String[] cmd = {"dirac-wms-job-get-output", "-D", storePath, Integer.toString(jobId)};
 		
 		try {
-			Process p  = Runtime.getRuntime().exec(cmd, null, exeDir);
-			InputStream stdout = p.getInputStream();
-			InputStream stderr = p.getErrorStream();
-
-			BufferedReader output = new BufferedReader(new InputStreamReader(
-					stdout));
-			String line = null;
-
-			while (((line = output.readLine()) != null)) {
-
-				log.info("[Stdout] " + line);
-
-			}
-			output.close();
-
-			BufferedReader brCleanUp = new BufferedReader(
-					new InputStreamReader(stderr));
-			while ((line = brCleanUp.readLine()) != null) {
-
-				log.error("[Stderr] " + line);
-
-			}
-
-			brCleanUp.close();
+			execute(cmd, exeDir);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DiracException("error-retrieving-output");
 		}
@@ -214,32 +167,8 @@ File exeDir = new File(userPath);
 		String[] cmd = {"dirac-wms-job-reschedule", Integer.toString(jobId)};
 		
 		try {
-			Process p  = Runtime.getRuntime().exec(cmd, null, exeDir);
-			InputStream stdout = p.getInputStream();
-			InputStream stderr = p.getErrorStream();
-
-			BufferedReader output = new BufferedReader(new InputStreamReader(
-					stdout));
-			String line = null;
-
-			while (((line = output.readLine()) != null)) {
-
-				log.info("[Stdout] " + line);
-
-			}
-			output.close();
-
-			BufferedReader brCleanUp = new BufferedReader(
-					new InputStreamReader(stderr));
-			while ((line = brCleanUp.readLine()) != null) {
-
-				log.error("[Stderr] " + line);
-
-			}
-
-			brCleanUp.close();
+			execute(cmd, exeDir);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			throw new DiracException("error-rescheduling-output");
 		}
@@ -252,6 +181,29 @@ File exeDir = new File(userPath);
 		String[] cmd = {"dirac-wms-job-delete", Integer.toString(jobId)};
 		
 		try {
+			execute(cmd, exeDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new DiracException("error-deleting-output");
+		}
+		
+	}
+
+	public void dowloadUserProxy(String path, String screenName, String group) throws DiracException {
+		String[] cmd = {"dirac-admin-get-proxy", screenName, group, "--out", path + "/x509up"};
+		
+		String logcmd = "";
+		
+		for(int i = 0; i < cmd.length; i++)
+			logcmd += cmd[i] + " ";
+		
+		log.info("Execute command: " + logcmd);
+		
+		File exeDir = new File(System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir"));
+		
+		try {
+			boolean status = true;
+			
 			Process p  = Runtime.getRuntime().exec(cmd, null, exeDir);
 			InputStream stdout = p.getInputStream();
 			InputStream stderr = p.getErrorStream();
@@ -263,6 +215,8 @@ File exeDir = new File(userPath);
 			while (((line = output.readLine()) != null)) {
 
 				log.info("[Stdout] " + line);
+				if(!line.contains("Proxy downloaded to"))
+					status = false;
 
 			}
 			output.close();
@@ -272,15 +226,51 @@ File exeDir = new File(userPath);
 			while ((line = brCleanUp.readLine()) != null) {
 
 				log.error("[Stderr] " + line);
-
+				status = false;
 			}
 
 			brCleanUp.close();
+			
+			if(!status)
+				throw new DiracException("no-proxy-uploaded");
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw new DiracException("error-deleting-output");
+			throw new DiracException("error-dowloading-proxy");
 		}
+		
+	}
+	
+	private boolean execute(String[] cmd, File path) throws IOException{
+		
+		boolean status = true;
+		
+		Process p  = Runtime.getRuntime().exec(cmd, null, path);
+		InputStream stdout = p.getInputStream();
+		InputStream stderr = p.getErrorStream();
+
+		BufferedReader output = new BufferedReader(new InputStreamReader(
+				stdout));
+		String line = null;
+
+		while (((line = output.readLine()) != null)) {
+
+			log.info("[Stdout] " + line);
+
+		}
+		output.close();
+
+		BufferedReader brCleanUp = new BufferedReader(
+				new InputStreamReader(stderr));
+		while ((line = brCleanUp.readLine()) != null) {
+
+			log.error("[Stderr] " + line);
+			status = false;
+		}
+
+		brCleanUp.close();
+		
+		return status;
 		
 	}
 }

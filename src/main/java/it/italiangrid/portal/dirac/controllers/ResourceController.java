@@ -1,13 +1,12 @@
 package it.italiangrid.portal.dirac.controllers;
 
 import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
+import it.italiangrid.portal.dirac.db.domain.Jobs;
 import it.italiangrid.portal.dirac.db.service.JobsService;
-import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.util.DiracUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 
@@ -46,6 +43,8 @@ public class ResourceController {
 
 				int jobId = Integer.parseInt(request.getParameter("jobId"));
 				
+				Jobs job = jobsService.findById(jobId);
+				
 				String userPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId();
 				
 				File storePath = new File(userPath + "/DIRAC/Outputs/" + jobsService.findById(jobId).getJobName());
@@ -55,12 +54,16 @@ public class ResourceController {
 				storePath.mkdirs();
 				
 				DiracAdminUtil util = new DiracAdminUtil();
-				util.getOutputJob(userPath, jobId, storePath.getAbsolutePath());
 				
-				DiracUtil.zip(storePath, zipFile);
+				util.dowloadUserProxy(storePath.getAbsolutePath(), job.getOwner(), job.getOwnerGroup());
+				util.getOutputJob(storePath.getAbsolutePath(), jobId, storePath.getAbsolutePath());
+				
+				File sourcePath = new File(storePath.getAbsolutePath()+"/"+job.getJobId());
+				
+				DiracUtil.zip(sourcePath, zipFile);
 				
 				response.setContentType("application/zip");
-				response.setProperty("Content-Disposition", "attachment; filename=\"" + jobsService.findById(jobId).getJobName() + ".zip\"");
+				response.setProperty("Content-Disposition", "attachment; filename=\"" + job.getJobName() + ".zip\"");
 				
 				
 				FileInputStream fileIn = new FileInputStream(zipFile);
@@ -80,17 +83,7 @@ public class ResourceController {
 				DiracUtil.delete(zipFile);
 				
 			}
-		} catch (PortalException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SystemException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (DiracException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

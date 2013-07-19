@@ -1,35 +1,26 @@
 package it.italiangrid.portal.dirac.controllers;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.PortletConfig;
+import javax.portlet.RenderRequest;
 
-import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
+import it.italiangrid.portal.dbapi.domain.UserInfo;
+import it.italiangrid.portal.dbapi.domain.Vo;
+import it.italiangrid.portal.dbapi.services.UserInfoService;
+import it.italiangrid.portal.dbapi.services.UserToVoService;
 import it.italiangrid.portal.dirac.model.Jdl;
-import it.italiangrid.portal.dirac.util.DiracUtil;
+import it.italiangrid.portal.dirac.util.DiracConfig;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
-import com.liferay.portal.kernel.servlet.SessionErrors;
-import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.upload.UploadPortletRequest;
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.JavaConstants;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 
@@ -40,6 +31,12 @@ public class SubmitJobController {
 	 * Logger
 	 */
 	private static final Logger log = Logger.getLogger(SubmitJobController.class);
+	
+	@Autowired
+	private UserInfoService userInfoService;
+	
+	@Autowired
+	private UserToVoService userToVoService;
 	
 	/**
 	 * Display the home page.
@@ -66,168 +63,62 @@ public class SubmitJobController {
 	public Jdl newJob(){
 		return new Jdl();
 	}
-	
-	@ActionMapping(params="myaction=submitJob")
-	public void submitJob(@ModelAttribute Jdl jdl, ActionRequest request, ActionResponse response){
-		log.info("Submitting job");
-		
-		
+
+	@ModelAttribute("vos")
+	public List<Vo> getUserVos(RenderRequest request){
 		try {
 			User user = PortalUtil.getUser(request);
-
-			if (user != null) {
+			if(user!=null){
+				log.info(user.getEmailAddress()); 
+				UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
 				
-				/*
-				 * Prepare temp folder for submission
-				 */
+				List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
 				
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
-				Calendar cal = new GregorianCalendar();
-				Date now = cal.getTime();
+				String[] excluded = DiracConfig.getProperties("Dirac.properties", "dirac.exclude.vos").split(";");
 				
-				String userPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId();
-				String tmpDir = "JDL_"+sdf.format(now);
-				String path = userPath + "/DIRAC/jdls/"+tmpDir;
-				
-				File jdlFolder = new File(path);
-				jdlFolder.mkdirs();
-				
-				/*
-				 * Get inputSandbox and jdl parameters
-				 */
-				
-				List<String> inputSandbox = new ArrayList<String>();
-				UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
-		        File tempFile;
-		        
-		        @SuppressWarnings("unchecked")
-				Enumeration<String> paramEnum = uploadRequest.getParameterNames();
-		        while (paramEnum.hasMoreElements())
-		        {
-		        	
-		            String parameter = paramEnum.nextElement();
-		            
-		           
-		            
-		            if (parameter.startsWith("uploadFile"))
-		            {
-		            	
-		                
-		                
-		                String fileName = uploadRequest.getFileName(parameter);
-		                log.info(parameter +" = "+fileName);
-		                
-		                if(!fileName.isEmpty()){
-		                	
-		                	log.info("Uploading " + fileName);
-		                
-		                	tempFile = uploadRequest.getFile(parameter, true);
-		                	
-		                	log.info("temp file " + tempFile.getAbsolutePath());
-		                	
-			                File destination = new File(path + "/" + fileName);
-			                
-			                log.info("destination file " + destination.getAbsolutePath());
-			                
-			                FileUtil.copyFile(tempFile, destination);
-			                
-			                tempFile.delete();
-		                	
-			                inputSandbox.add(path+"/"+fileName);
-			                
-			             }
-		            }else{
-		            	
-		            	
-		            	if(parameter.contains("executableFile")){
-		            		 String fileName = uploadRequest.getFileName(parameter);
-				                log.info(parameter +" = "+fileName);
-				                
-				                if(!fileName.isEmpty()){
-				                	
-				                	log.info("Uploading exe file: " + fileName);
-				                
-				                	tempFile = uploadRequest.getFile(parameter, true);
-				                	
-				                	log.info("temp file " + tempFile.getAbsolutePath());
-				                	
-					                File destination = new File(path + "/" + fileName);
-					                
-					                log.info("destination file " + destination.getAbsolutePath());
-					                
-					                FileUtil.copyFile(tempFile, destination);
-					                
-					                tempFile.delete();
-				                	
-					                inputSandbox.add(path+"/"+fileName);
-					                jdl.setExecutable(fileName);
-					                
-					             }
-		            	} else{
-			            	String value = uploadRequest.getParameter(parameter);
-					          
-			            	log.info(parameter +" = "+value);
-					        
-					        jdl.setParameter(parameter, value);
-		            	}
-		            }
-		        }
-		        
-		        List<String> outputSandbox = new ArrayList<String>();
-				outputSandbox.add(jdl.getStdOutput());
-				outputSandbox.add(jdl.getStdError());
-				if(!jdl.getOutputSandboxRequest().isEmpty()){
-					for(String s: jdl.getOutputSandboxRequest().split(";")){
-						outputSandbox.add(s.replaceAll(" ", ""));
-					}
+				List<Vo> result = new ArrayList<Vo>();
+				for (Vo vo : vos) {
+					if(notIn(vo.getVo(), excluded))
+						result.add(vo);
 				}
-				jdl.setOutputSandbox(outputSandbox);
-		        
-		        if(!inputSandbox.isEmpty()){
-		        	jdl.setInputSandbox(inputSandbox);
-		        }
-		 
-		        log.info("Jdl:\n"+jdl);
-		        
-		        /*
-				 * Save jdl on file
-				 */
-				
-				String jdlFilename = jdl.getJobName()+".jdl";
-				
-				FileOutputStream jdlFile = new FileOutputStream(path + "/" + jdlFilename);
-				jdlFile.write(jdl.toString().getBytes());
-				jdlFile.close();
-				
-				/*
-				 * Submit job
-				 */
-				
-				DiracAdminUtil util = new DiracAdminUtil();
-				util.submitJob(userPath, path, jdlFilename);
-				
-				/*
-				 * Delete temp folder
-				 */
-				DiracUtil.delete(jdlFolder);
-				
-				
+				return result;
 			}
-			
-			SessionMessages.add(request, "submit-successufully");
-			
-			return;
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		SessionErrors.add(request, "submit-error");
-		PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
-		SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
-		
-		response.setRenderParameter("myaction", "showSubmitJob");
-		request.setAttribute("jdl", jdl);
-		
+		return null;
 	}
+	
+	private boolean notIn(String vo, String[] excluded) {
+		
+		for (String excludedVo : excluded) {
+			if(vo.equals(excludedVo)){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
+	@ModelAttribute("defaultVo")
+	public String getUserDefaultVo(RenderRequest request){
+		try {
+			
+			User user = PortalUtil.getUser(request);
+			
+			if(user!=null){
+			
+				UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
+				
+				return userToVoService.findDefaultVo(userInfo.getUserId());
+			}
+		} catch (PortalException e) {
+			e.printStackTrace();
+		} catch (SystemException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 }

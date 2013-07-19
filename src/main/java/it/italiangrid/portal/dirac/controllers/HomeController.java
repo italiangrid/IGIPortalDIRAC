@@ -7,9 +7,7 @@ import javax.portlet.RenderRequest;
 import it.italiangrid.portal.dbapi.domain.UserInfo;
 import it.italiangrid.portal.dbapi.services.CertificateService;
 import it.italiangrid.portal.dbapi.services.UserInfoService;
-import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.db.domain.Jobs;
-import it.italiangrid.portal.dirac.db.domain.Proxies;
 import it.italiangrid.portal.dirac.db.service.JobsService;
 import it.italiangrid.portal.dirac.db.service.ProxiesService;
 
@@ -68,33 +66,14 @@ public class HomeController {
 
 			if (user != null) {
 				log.info("User logged in.....");
-				UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
-				log.info(userInfo.getFirstName() + " " +userInfo.getLastName());
-				DiracAdminUtil util = new DiracAdminUtil();
-				if(!util.userExist(userInfo.getPersistentId())){
-					if(util.addDiracUser(userInfo, certificateService))
-						log.info("User added");
-					else
-						log.info("User not added");
-				}else{
-					log.info("User already added");
-				}
+				return "home";
 			}
-			
-//			return "home";
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		List<Proxies> proxies = proxiesService.getAllProxies();
-		
-		for(Proxies p: proxies){
-			log.info("-----> "+ p.getUserName() + " - " + p.getId().getUserDn() + " - " + p.getId().getUserGroup());
-		}
-		
-		return "home";
-//		return "error";
+		return "error";
 	}
 	
 	@ModelAttribute("jobs")
@@ -109,8 +88,6 @@ public class HomeController {
 				
 				return jobService.findByOwner(userInfo.getPersistentId());
 			}
-			
-//			return "home";
 
 		} catch (Exception e) {
 			e.printStackTrace();

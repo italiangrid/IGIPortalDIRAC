@@ -27,6 +27,20 @@
 			</plugin>
 		</plugins>
 	</build>
+	<repositories>
+		<repository>
+           <id>switch</id>
+           <name>SWITCH Releases</name>
+           <url>http://www.switch.ch/grid/authz/docs/maven2/release</url>
+           <snapshots>
+               <enabled>false</enabled>
+           </snapshots>
+       </repository>
+       
+       
+       
+       
+	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>com.liferay.portal</groupId>
@@ -92,6 +106,26 @@
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.bouncycastle</groupId>
+		    <artifactId>bcprov-jdk15</artifactId>
+		    <version>1.46</version>	
+		</dependency>
+		<dependency>
+		    <groupId>eu.eu-emi.security</groupId>
+		    <artifactId>canl</artifactId>
+		    <version>1.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+           <groupId>emi</groupId>
+           <artifactId>trustmanager</artifactId>
+           <version>3.0.5</version>
+       </dependency>
 	</dependencies>
 	<properties>
 		<liferay.auto.deploy.dir>../bundles/liferay-portal-6.1.0/deploy</liferay.auto.deploy.dir>
