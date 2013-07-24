@@ -9,6 +9,7 @@ import it.italiangrid.portal.dbapi.domain.UserInfo;
 import it.italiangrid.portal.dbapi.domain.Vo;
 import it.italiangrid.portal.dbapi.services.UserInfoService;
 import it.italiangrid.portal.dbapi.services.UserToVoService;
+import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.model.Jdl;
 import it.italiangrid.portal.dirac.util.DiracConfig;
 
@@ -83,11 +84,33 @@ public class SubmitJobController {
 				}
 				return result;
 			}
+		}catch (DiracException e){
+			log.error(e.getMessage());
+			User user;
+			try {
+				user = PortalUtil.getUser(request);
+				if(user!=null){
+					log.info(user.getEmailAddress()); 
+					UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
+					
+					List<Vo> vos = userToVoService.findVoByUserId(userInfo.getUserId());
+					
+					return vos;
+				}
+			} catch (PortalException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (SystemException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return new ArrayList<Vo>();
 	}
 	
 	private boolean notIn(String vo, String[] excluded) {
