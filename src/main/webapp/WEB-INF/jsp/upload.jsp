@@ -6,10 +6,14 @@
 	<div id="presentationDirac">Upload Proxy</div>
 	<div id="contentDirac">
 	
-		<liferay-ui:error key="error-dowloading-proxy"
-			message="error-dowloading-proxy" />
 		<liferay-ui:error key="upload-error"
 			message="upload-error" />
+		<liferay-ui:error key="no-certificate-found"
+			message="no-certificate-found" />
+		<liferay-ui:error key="certificate-not-corresponding"
+			message="certificate-not-corresponding" />
+		<liferay-ui:error key="check-certificate-password"
+			message="check-certificate-password" />
 			
 		<portlet:actionURL var="uploadCertUrl">
 			<portlet:param name="myaction" value="uploadCert" />
