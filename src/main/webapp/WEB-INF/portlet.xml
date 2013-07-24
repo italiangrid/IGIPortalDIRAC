@@ -32,12 +32,12 @@
 		<security-role-ref>
 			<role-name>user</role-name>
 		</security-role-ref>
-		<supported-processing-event>
-			<qname xmlns:x="http://liferay.com/events">x:add.task</qname>
-		</supported-processing-event>
+		<supported-publishing-event>
+			<qname xmlns:t="http://flyback.cnaf.infn.it:8080/dirac">t:addtask</qname>
+		</supported-publishing-event>
 	</portlet>
 	<event-definition>
-		<qname xmlns:x="http://liferay.com/events">x:add.task</qname>
+		<qname xmlns:t="http://flyback.cnaf.infn.it:8080/dirac">t:addtask</qname>
 		<value-type>java.lang.String</value-type>
 	</event-definition>
 </portlet-app>
