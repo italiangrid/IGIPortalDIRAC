@@ -122,8 +122,8 @@
 						<aui:input type="text" id="executable" label="Executable" name="executable" value="${jdl.executable }"/>
 					</div>
 					<aui:input type="text" label="Arguments" name="arguments" value="${jdl.arguments }"/>
-					
-					<select name="vo">
+					<label for="selectVO"><strong>VO</strong></label><br/>
+					<select id="selectVO" name="vo">
 					
 						<c:forEach var="vo" items="${vos }">
 							<c:if test="${vo.vo == defaultVo }">
@@ -141,6 +141,18 @@
 					</div>
 					<div id="stdErrorDiv" style="display: none;">
 						<aui:input type="text" label="Standard Error" name="stdError" value="${jdl.stdError }"/>
+					</div>
+					<div id="parametersDiv" style="display: none;">
+						<aui:input type="text" label="Parameters" name="parameters" value="${jdl.parameters }"/>
+					</div>
+					<div id="parameterStartDiv" style="display: none;">
+						<aui:input type="text" label="Parameter Start" name="parameterStart" value="${jdl.parameterStart }"/>
+					</div>
+					<div id="parameterStepDiv" style="display: none;">
+						<aui:input type="text" label="Parameter Step" name="parameterStep" value="${jdl.parameterStep }"/>
+					</div>
+					<div id="parametersDiv" style="display: none;">
+						<aui:input type="text" label="Parameters" name="parameters" value="${jdl.parameters }"/>
 					</div>
 					<div id="cpuNumberDiv" style="display: none;">
 						<aui:input type="text" label="CPU Number (MPI)" name="cpuNumber" value="${jdl.cpuNumber }"/>
@@ -199,6 +211,18 @@
 					</div>
 					<hr/>
 					<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> PARAMETRIC </label>
+					<div>
+					<a id="parametersadd" href="#parametersDiv" onclick="$('#parametersDiv').show(); $('#parametersremove').show(); $('#parametersadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameters</a>
+					<a id="parametersremove" style="display: none;" href="#parametersDiv" onclick="$('#parametersDiv').hide(); $('#parametersadd').show(); $('#parametersremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameters</a>
+					</div>
+					<div>
+					<a id="parameterStartadd" href="#parameterStartDiv" onclick="$('#parameterStartDiv').show(); $('#parameterStartremove').show(); $('#parameterStartadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Start</a>
+					<a id="parameterStartremove" style="display: none;" href="#parameterStartDiv" onclick="$('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Start</a>
+					</div>
+					<div>
+					<a id="parameterStepadd" href="#parameterStepDiv" onclick="$('#parameterStepDiv').show(); $('#parameterStepremove').show(); $('#parameterStepadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Step</a>
+					<a id="parameterStepremove" style="display: none;" href="#parameterStepDiv" onclick="$('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Step</a>
+					</div>
 				</aui:fieldset>	
 			</div>
 			<div id="reset"></div>

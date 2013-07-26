@@ -18,7 +18,7 @@ public class Jdl {
 	private String outputSE;
 	private List<List<String>> outputData;
 	private String outputPath;
-	private List<String> parameters;
+	private String parameters;
 	private String parameterStart;
 	private String parameterStep;
 	private String cpuNumber;
@@ -69,7 +69,7 @@ public class Jdl {
 			List<String> outputSandboxDestUri, String stdOutput,
 			String stdError, List<String> inputData, String outputSE,
 			List<List<String>> outputData, String outputPath,
-			List<String> parameters, String paramenterStart,
+			String parameters, String paramenterStart,
 			String parameterStep, String cpuNumber, String hostNumber,
 			String wholeNodes, String smpGranularity, String vo) {
 		super();
@@ -293,7 +293,7 @@ public class Jdl {
 	/**
 	 * @return the parameters
 	 */
-	public List<String> getParameters() {
+	public String getParameters() {
 		return parameters;
 	}
 
@@ -301,7 +301,7 @@ public class Jdl {
 	 * @param parameters
 	 *            the parameters to set
 	 */
-	public void setParameters(List<String> parameters) {
+	public void setParameters(String parameters) {
 		this.parameters = parameters;
 	}
 
@@ -413,6 +413,12 @@ public class Jdl {
 	@Override
 	public String toString() {
 		String string = "";
+		
+//		if (parameters != null) {
+//			string += "JobType = \"Parametric\";\n";
+//		}else{
+//			string += "JobType = \"Normal\";\n";
+//		}
 		if (jobName != null) {
 			string += "JobName = \"" + jobName + "\";\n";
 		}
@@ -471,7 +477,7 @@ public class Jdl {
 
 			string += "};\n";
 		}
-		if (outputSE != null) {
+		if (outputSE != null && !outputSE.isEmpty()) {
 			string += "OutputSE = \"" + outputSE + "\";\n";
 		}
 		if (outputData != null) {
@@ -496,7 +502,7 @@ public class Jdl {
 			string += "};\n";
 		}
 		if (parameters != null) {
-			if (parameters.get(0).matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+")) {
+			if (parameters.matches("((-|\\+)?[0-9]+(\\.[0-9]+)?)+")) {
 				string += "Parameters = " + parameters + ";\n";
 				if (parameterStart != null) {
 					string += "ParameterStart = " + parameterStart + ";\n";
@@ -506,7 +512,7 @@ public class Jdl {
 				}
 			} else {
 				string += "Parameters = {";
-				for (String s : parameters) {
+				for (String s : parameters.split(";")) {
 					string += "\"" + s + "\", ";
 				}
 
@@ -550,7 +556,7 @@ public class Jdl {
 		case 10: this.outputSE = (String) value; break;
 //		case 11: this.outputData = (List<List<String>>) value; break;
 		case 12: this.outputPath = (String) value; break;
-//		case 13: this.parameters = (List<String>) value; break;
+		case 13: this.parameters = (String) value; break;
 		case 14: this.parameterStart = (String) value; break;
 		case 15: this.parameterStep = (String) value; break;
 		case 16: this.cpuNumber = (String) value; break;
