@@ -541,7 +541,6 @@ public class Jdl {
 	
 	public void setParameter(String parameter, Object value) {
 		int index = parameterNames.indexOf(parameter);
-		System.out.println("Index of "+parameter+" = " + index);
 		switch(index){
 		case 0: this.jobName = (String) value; break;
 		case 1: this.executable = (String) value; break;
@@ -566,7 +565,6 @@ public class Jdl {
 		case 20: this.vo = (String) value; break;
 		
 		}
-		System.out.println("Ci sono!!");
 	}
 
 }

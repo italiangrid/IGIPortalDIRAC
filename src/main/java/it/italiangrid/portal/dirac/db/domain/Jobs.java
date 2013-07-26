@@ -23,12 +23,12 @@ public class Jobs implements java.io.Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -5054646062967864252L;
-	private int jobId;
+	private long jobId;
 	private String jobType;
 	private String diracsetup;
 	private String jobGroup;
 	private String jobSplitType;
-	private int masterJobId;
+	private long masterJobId;
 	private String site;
 	private String jobName;
 	private String owner;
@@ -61,7 +61,7 @@ public class Jobs implements java.io.Serializable {
 	}
 
 	public Jobs(String jobType, String diracsetup, String jobGroup,
-			String jobSplitType, int masterJobId, String site, String jobName,
+			String jobSplitType, long masterJobId, String site, String jobName,
 			String owner, String ownerDn, String ownerGroup, String status,
 			String minorStatus, String applicationStatus,
 			int applicationNumStatus, float cputime, int userPriority,
@@ -98,7 +98,7 @@ public class Jobs implements java.io.Serializable {
 	}
 
 	public Jobs(String jobType, String diracsetup, String jobGroup,
-			String jobSplitType, int masterJobId, String site, String jobName,
+			String jobSplitType, long masterJobId, String site, String jobName,
 			String owner, String ownerDn, String ownerGroup,
 			Date submissionTime, Date rescheduleTime, Date lastUpdateTime,
 			Date startExecTime, Date heartBeatTime, Date endExecTime,
@@ -145,11 +145,11 @@ public class Jobs implements java.io.Serializable {
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "JobID", unique = true, nullable = false)
-	public int getJobId() {
+	public long getJobId() {
 		return this.jobId;
 	}
 
-	public void setJobId(int jobId) {
+	public void setJobId(long jobId) {
 		this.jobId = jobId;
 	}
 
@@ -190,11 +190,11 @@ public class Jobs implements java.io.Serializable {
 	}
 
 	@Column(name = "MasterJobID", nullable = false)
-	public int getMasterJobId() {
+	public long getMasterJobId() {
 		return this.masterJobId;
 	}
 
-	public void setMasterJobId(int masterJobId) {
+	public void setMasterJobId(long masterJobId) {
 		this.masterJobId = masterJobId;
 	}
 
