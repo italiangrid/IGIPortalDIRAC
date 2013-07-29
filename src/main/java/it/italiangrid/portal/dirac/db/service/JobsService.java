@@ -10,7 +10,7 @@ public interface JobsService {
 
 	public void delete(Jobs persistentInstance);
 
-	public Jobs findById(Integer id);
+	public Jobs findById(Long id);
 
 	public List<Jobs> getAllJobs();
 	

@@ -16,7 +16,11 @@ import javax.portlet.PortletConfig;
 
 import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.model.Jdl;
+import it.italiangrid.portal.dirac.model.Notify;
+import it.italiangrid.portal.dirac.server.Checker;
 import it.italiangrid.portal.dirac.util.DiracUtil;
+import it.italiangrid.portal.dirac.util.GuseNotify;
+import it.italiangrid.portal.dirac.util.GuseNotifyUtil;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -182,7 +186,18 @@ public class SubmitJobControllerAction {
 				 * Submit job
 				 */
 				
-				util.submitJob(path, path, jdlFilename);
+				List<Long> ids = util.submitJob(path, path, jdlFilename);
+				
+				/*
+				 * Adding notify task
+				 */
+				boolean isNotify = isNotificationSetted(user);
+				
+				log.info("notify = " + isNotify);
+				if(isNotify){
+					Notify notify = new Notify(user.getEmailAddress(), user.getFirstName(), ids);
+					Checker.addNotify(notify);
+				}
 				
 				/*
 				 * Delete temp folder
@@ -200,7 +215,7 @@ public class SubmitJobControllerAction {
 			
 			if(e.getMessage().contains("no-proxy-uploaded")){
 				
-				SessionErrors.add(request, "error-dowloading-proxy");
+				SessionErrors.add(request, e.getMessage());
 				PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
 				SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
 				
@@ -208,7 +223,11 @@ public class SubmitJobControllerAction {
 				
 				return;
 			}else{
-				e.printStackTrace();
+				if (e.getMessage().equals("submit-error")){
+					SessionErrors.add(request, "check-jdl");
+				}else{
+					e.printStackTrace();
+				}
 			}
 		}
 		
@@ -219,5 +238,18 @@ public class SubmitJobControllerAction {
 		response.setRenderParameter("myaction", "showSubmitJob");
 		request.setAttribute("jdl", jdl);
 		
+	}
+
+	private boolean isNotificationSetted(User user) {
+		GuseNotifyUtil gnu = new GuseNotifyUtil();
+		GuseNotify gn = gnu.readNotifyXML(user);
+		if(gn!=null){
+			
+			log.info("The notification configuration is: " + gn.getWfchgEnab());
+			
+			if(gn.getWfchgEnab().equals("true"))
+				return true;
+		}
+		return false;
 	}
 }

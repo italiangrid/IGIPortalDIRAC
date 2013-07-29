@@ -10,7 +10,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class JobsDAOHibernate extends GenericHibernateDAO<Jobs, Integer> implements JobsDAO {
+public class JobsDAOHibernate extends GenericHibernateDAO<Jobs, Long> implements JobsDAO {
 
 	public List<Jobs> findByOwner(String owner) {
 		

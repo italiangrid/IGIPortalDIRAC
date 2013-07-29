@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -123,7 +125,7 @@ public class DiracAdminUtil {
 		return status;
 	}
 
-	public void submitJob(String userPath, String path, String jdlFilename) throws DiracException {
+	public List<Long> submitJob(String userPath, String path, String jdlFilename) throws DiracException {
 		log.info("Submitting job");
 		String[] cmd = {"dirac-wms-job-submit", path+"/"+jdlFilename};
 		
@@ -137,23 +139,27 @@ public class DiracAdminUtil {
 		log.info("Execution Path: " + userPath);
 		log.info("Execute command: " + logcmd);
 		
+		List<Long> jobIDs = new ArrayList<Long>();
+		
 		try {
-			execute(cmd, exePath);
+			execute(cmd, exePath, jobIDs);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new DiracException("userAdd-execution-error");
 		}
+		
+		return jobIDs;
 	}
 
-	public void getOutputJob(String userPath, int jobId, String storePath) throws DiracException {
+	public void getOutputJob(String userPath, long jobId, String storePath) throws DiracException {
 		
 		File exeDir = new File(userPath);
 		
-		String[] cmd = {"dirac-wms-job-get-output", "-D", storePath, Integer.toString(jobId)};
+		String[] cmd = {"dirac-wms-job-get-output", "-D", storePath, Long.toString(jobId)};
 		
 		try {
-			execute(cmd, exeDir);
+			execute(cmd, exeDir, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new DiracException("error-retrieving-output");
@@ -162,12 +168,12 @@ public class DiracAdminUtil {
 	}
 
 	public void getRescheduleJob(String userPath, int jobId) throws DiracException {
-File exeDir = new File(userPath);
+		File exeDir = new File(userPath);
 		
 		String[] cmd = {"dirac-wms-job-reschedule", Integer.toString(jobId)};
 		
 		try {
-			execute(cmd, exeDir);
+			execute(cmd, exeDir, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new DiracException("error-rescheduling-output");
@@ -181,7 +187,7 @@ File exeDir = new File(userPath);
 		String[] cmd = {"dirac-wms-job-delete", Integer.toString(jobId)};
 		
 		try {
-			execute(cmd, exeDir);
+			execute(cmd, exeDir, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new DiracException("error-deleting-output");
@@ -241,7 +247,7 @@ File exeDir = new File(userPath);
 		
 	}
 	
-	private boolean execute(String[] cmd, File path) throws IOException{
+	private boolean execute(String[] cmd, File path, List<Long> jobIDs) throws IOException, DiracException{
 		
 		boolean status = true;
 		
@@ -256,7 +262,14 @@ File exeDir = new File(userPath);
 		while (((line = output.readLine()) != null)) {
 
 			log.info("[Stdout] " + line);
-
+			if(line.contains("Illegal value for ParameterStart JDL field"))
+				throw new DiracException("submit-error");
+			if(line.contains("JobID = [")){
+				String[] ids = line.replace("JobID = [", "").replace("]", "").replaceAll(" ", "").split(",");
+				for (String string : ids) {
+					jobIDs.add(Long.parseLong(string));
+				}
+			}
 		}
 		output.close();
 

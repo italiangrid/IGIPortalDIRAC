@@ -26,11 +26,17 @@
 			list = newlist;
 	
 		if (list.length == 0) {
-			$("#deleteButton").hide("slow");
+			$(".deleteButton").hide("slow");
 		} else {
-			$("#deleteButton").show("slow");
+			$(".deleteButton").show("slow");
 		}
 	}
+	
+	$(document).ready(function() {
+		setTimeout(function(){
+			location.href='https://flyback.cnaf.infn.it/dirac';
+	    }, 20000);
+	});
 	
 	(function ($) {
 
@@ -318,7 +324,7 @@
 		</aui:column>
 		
 		<aui:column columnWidth="50">
-			<aui:form>
+			<aui:form id="refresh" name="refresh">
 				<aui:button-row >
 					<aui:button style="float: right;" type="button" value="Refresh" onClick="location.href='https://flyback.cnaf.infn.it/dirac';"/>
 				</aui:button-row>
@@ -333,6 +339,14 @@
 			<portlet:param name="myaction" value="deleteMultipleJob"/>
 		</portlet:actionURL>		
 		<form name="delMultForm" action="${deleteMultipleJob}" method="POST">
+			
+			<div class="deleteButton" style="display: none;">
+				<aui:button-row>
+					<aui:button type="submit" value="Delete Selected Jobs"
+						onClick="return confirm('Are you sure you want to delete these jobs?');" />
+				</aui:button-row>
+			</div>
+			
 			<liferay-ui:search-container
 				emptyResultsMessage="No Jobs" delta="20">
 				<liferay-ui:search-container-results>
@@ -428,7 +442,7 @@
 				</liferay-ui:search-container-row>
 				<liferay-ui:search-iterator />
 			</liferay-ui:search-container>
-			<div id="deleteButton" style="display: none;">
+			<div class="deleteButton" style="display: none;">
 				<aui:button-row>
 					<aui:button type="submit" value="Delete Selected Jobs"
 						onClick="return confirm('Are you sure you want to delete these jobs?');" />

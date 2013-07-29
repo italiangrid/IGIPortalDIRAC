@@ -34,7 +34,7 @@ public class JobsServiceImpl implements JobsService {
 	}
 
 	@Transactional
-	public Jobs findById(Integer id) {
+	public Jobs findById(Long id) {
 		log.debug("getting Jobs instance with id: " + id);
 		return jobsDAO.findById(id,false);
 	}

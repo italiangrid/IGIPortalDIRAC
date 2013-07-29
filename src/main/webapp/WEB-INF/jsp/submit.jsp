@@ -104,6 +104,9 @@
 	
 		<liferay-ui:error key="submit-error"
 			message="submit-error" />
+		<liferay-ui:error key="check-jdl"
+			message="check-jdl" />	
+			
 		<portlet:actionURL var="submitUrl">
 			<portlet:param name="myaction" value="submitJob" />
 		</portlet:actionURL>
@@ -143,16 +146,13 @@
 						<aui:input type="text" label="Standard Error" name="stdError" value="${jdl.stdError }"/>
 					</div>
 					<div id="parametersDiv" style="display: none;">
-						<aui:input type="text" label="Parameters" name="parameters" value="${jdl.parameters }"/>
+						<aui:input type="text" label="Parameters" name="parameters" value="${jdl.parameters }" />
 					</div>
 					<div id="parameterStartDiv" style="display: none;">
 						<aui:input type="text" label="Parameter Start" name="parameterStart" value="${jdl.parameterStart }"/>
 					</div>
 					<div id="parameterStepDiv" style="display: none;">
 						<aui:input type="text" label="Parameter Step" name="parameterStep" value="${jdl.parameterStep }"/>
-					</div>
-					<div id="parametersDiv" style="display: none;">
-						<aui:input type="text" label="Parameters" name="parameters" value="${jdl.parameters }"/>
 					</div>
 					<div id="cpuNumberDiv" style="display: none;">
 						<aui:input type="text" label="CPU Number (MPI)" name="cpuNumber" value="${jdl.cpuNumber }"/>
@@ -177,15 +177,15 @@
 			<div id="addMenù">
 				<aui:fieldset label="Add or Remove fields">
 					<div>
-					<a id="stdoutadd" href="#stdOutputDiv" onclick="$('#stdOutputDiv').show(); $('#stdoutremove').show(); $('#stdoutadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Standard Output</a>
+					<a id="stdoutadd" href="#stdOutputDiv" onclick="$('#stdOutputDiv').show(); setTimeout( function() { $('#stdOutputDiv input').focus(); }, 500 ); $('#stdoutremove').show(); $('#stdoutadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Standard Output</a>
 					<a id="stdoutremove" style="display: none;" href="#stdOutputDiv" onclick="$('#stdOutputDiv').hide(); $('#stdoutadd').show(); $('#stdoutremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Standard Output</a>
 					</div>
 					<div>
-					<a id="stderradd" href="#stdErrorDiv" onclick="$('#stdErrorDiv').show(); $('#stderrremove').show(); $('#stderradd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Standard Error</a>
+					<a id="stderradd" href="#stdErrorDiv" onclick="$('#stdErrorDiv').show(); setTimeout( function() { $('#stdErrorDiv input').focus(); }, 500 ); $('#stderrremove').show(); $('#stderradd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Standard Error</a>
 					<a id="stderrremove" style="display: none;" href="#stdErrorDiv" onclick="$('#stdErrorDiv').hide(); $('#stderradd').show(); $('#stderrremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Standard Error</a>
 					</div>
 					<div>
-					<a id="outadd" href="#outputSandboxDiv" onclick="$('#outputSandboxDiv').show(); $('#outremove').show(); $('#outadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Output Sandbox</a>
+					<a id="outadd" href="#outputSandboxDiv" onclick="$('#outputSandboxDiv').show(); setTimeout( function() { $('#outputSandboxDiv input').focus(); }, 500 ); $('#outremove').show(); $('#outadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Output Sandbox</a>
 					<a id="outremove" style="display: none;" href="#outputSandboxDiv" onclick="$('#outputSandboxDiv').hide(); $('#outadd').show(); $('#outremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Output Sandbox</a>
 					</div>
 					<div>
@@ -194,33 +194,33 @@
 					<hr/>
 					<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> MPI </label>
 					<div>
-					<a id="cpuadd" href="#cpuNumberDiv" onclick="$('#cpuNumberDiv').show(); $('#cpuremove').show(); $('#cpuadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> CPU Number</a>
+					<a id="cpuadd" href="#cpuNumberDiv" onclick="$('#cpuNumberDiv').show(); setTimeout( function() { $('#cpuNumberDiv input').focus(); }, 500 ); $('#cpuremove').show(); $('#cpuadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> CPU Number</a>
 					<a id="cpuremove" style="display: none;" href="#cpuNumberDiv" onclick="$('#cpuNumberDiv').hide(); $('#cpuadd').show(); $('#cpuremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> CPU Number</a>
 					</div>
 					<div>
-					<a id="hostadd" href="#hostNumberDiv" onclick="$('#hostNumberDiv').show(); $('#hostremove').show(); $('#hostadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Host Number</a>
+					<a id="hostadd" href="#hostNumberDiv" onclick="$('#hostNumberDiv').show(); setTimeout( function() { $('#hostNumberDiv input').focus(); }, 500 ); $('#hostremove').show(); $('#hostadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Host Number</a>
 					<a id="hostremove" style="display: none;" href="#hostNumberDiv" onclick="$('#hostNumberDiv').hide(); $('#hostadd').show(); $('#hostremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Host Number</a>
 					</div>
 					<div>
-					<a id="wholeadd" href="#wholeNodesDiv" onclick="$('#wholeNodesDiv').show(); $('#wholeremove').show(); $('#wholeadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Whole Nodes</a>
+					<a id="wholeadd" href="#wholeNodesDiv" onclick="$('#wholeNodesDiv').show(); setTimeout( function() { $('#wholeNodesDiv input').focus(); }, 500 ); $('#wholeremove').show(); $('#wholeadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Whole Nodes</a>
 					<a id="wholeremove" style="display: none;" href="#wholeNodesDiv" onclick="$('#wholeNodesDiv').hide(); $('#wholeadd').show(); $('#wholeremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Whole Nodes</a>
 					</div>
 					<div>
-					<a id="smpadd" href="#smpGranularityDiv" onclick="$('#smpGranularityDiv').show(); $('#smpremove').show(); $('#smpadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> SMP Granularity</a>
+					<a id="smpadd" href="#smpGranularityDiv" onclick="$('#smpGranularityDiv').show(); setTimeout( function() { $('#smpGranularityDiv input').focus(); }, 500 ); $('#smpremove').show(); $('#smpadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> SMP Granularity</a>
 					<a id="smpremove" style="display: none;" href="#smpGranularityDiv" onclick="$('#smpGranularityDiv').hide(); $('#smpadd').show(); $('#smpremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> SMP Granularity</a>
 					</div>
 					<hr/>
 					<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> PARAMETRIC </label>
 					<div>
-					<a id="parametersadd" href="#parametersDiv" onclick="$('#parametersDiv').show(); $('#parametersremove').show(); $('#parametersadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameters</a>
+					<a id="parametersadd" href="#parametersDiv" onclick="$('#parametersDiv').show(); $('#parametersremove').show(); $('#parametersadd').hide(); alert('Provide a number or a list \'semicolon\' separated.\nUse \'%s\' where you want your parameter is placed.'); setTimeout( function() { $('#parametersDiv input').focus(); }, 500 );"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameters</a>
 					<a id="parametersremove" style="display: none;" href="#parametersDiv" onclick="$('#parametersDiv').hide(); $('#parametersadd').show(); $('#parametersremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameters</a>
 					</div>
 					<div>
-					<a id="parameterStartadd" href="#parameterStartDiv" onclick="$('#parameterStartDiv').show(); $('#parameterStartremove').show(); $('#parameterStartadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Start</a>
+					<a id="parameterStartadd" href="#parameterStartDiv" onclick="$('#parameterStartDiv').show(); setTimeout( function() { $('#parameterStartDiv input').focus(); }, 500 ); $('#parameterStartremove').show(); $('#parameterStartadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Start</a>
 					<a id="parameterStartremove" style="display: none;" href="#parameterStartDiv" onclick="$('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Start</a>
 					</div>
 					<div>
-					<a id="parameterStepadd" href="#parameterStepDiv" onclick="$('#parameterStepDiv').show(); $('#parameterStepremove').show(); $('#parameterStepadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Step</a>
+					<a id="parameterStepadd" href="#parameterStepDiv" onclick="$('#parameterStepDiv').show(); setTimeout( function() { $('#parameterStepDiv input').focus(); }, 500 ); $('#parameterStepremove').show(); $('#parameterStepadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Step</a>
 					<a id="parameterStepremove" style="display: none;" href="#parameterStepDiv" onclick="$('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Step</a>
 					</div>
 				</aui:fieldset>	

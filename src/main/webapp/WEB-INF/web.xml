@@ -17,4 +17,8 @@
 		<servlet-name>view-servlet</servlet-name>
 		<url-pattern>/WEB-INF/servlet/view</url-pattern>
 	</servlet-mapping>
+	
+	<listener>
+		<listener-class>it.italiangrid.portal.dirac.server.CheckerService</listener-class>
+	</listener>
 </web-app>

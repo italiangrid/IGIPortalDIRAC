@@ -41,7 +41,7 @@ public class ResourceController {
 			User user = PortalUtil.getUser(request);
 			if (user != null) {
 
-				int jobId = Integer.parseInt(request.getParameter("jobId"));
+				long jobId = Long.parseLong(request.getParameter("jobId"));
 				
 				Jobs job = jobsService.findById(jobId);
 				
