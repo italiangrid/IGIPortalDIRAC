@@ -32,6 +32,18 @@
 		}
 	}
 	
+	function setAll(element){
+		var val = element.attr('checked');
+		if(val == "checked"){
+			$(".deleteCheckbox").attr('checked', true);
+			$(".deleteButton").show("slow");
+		}else{
+			$(".deleteCheckbox").attr('checked', false);
+			$(".deleteButton").hide("slow");
+		}
+		
+	}
+	
 	$(document).ready(function() {
 		
 		if(${isAllJobsTerminate}==false){
@@ -41,259 +53,8 @@
 		}
 	});
 	
-	(function ($) {
-
-		/**********************************
-		* CUSTOMIZE THE DEFAULT SETTINGS
-		* Ex:
-		* var _settings = {
-		* 	id: 'modal',
-		* 	src: function(sender){
-		*		return jQuery(sender).attr('href');
-		*	},
-		* 	width: 800,
-		* 	height: 600
-		* }
-		**********************************/
-		var _settings3 = {
-			width: 800, // Use this value if not set in CSS or HTML
-			height: 600, // Use this value if not set in CSS or HTML
-			overlayOpacity: .85, // Use this value if not set in CSS or HTML
-			id: 'modal',
-			fadeInSpeed: 0,
-			fadeOutSpeed: 0
-		};
-
-		/**********************************
-		* DO NOT CUSTOMIZE BELOW THIS LINE
-		**********************************/
-		$.modal3 = function (options) {
-			return _modal3(this, options);
-		};
-		$.modal3.open = function () {
-			_modal3.open();
-		};
-		$.modal3.close = function () {
-			_modal3.close();
-		};
-		$.fn.modal3 = function (options) {
-			return _modal3(this, options);
-		};
-		_modal3 = function (sender, params) {
-			this.options = {
-				parent: null,
-				overlayOpacity: null,
-				id: null,
-				content: null,
-				width: null,
-				height: null,
-				message: false,
-				modalClassName: null,
-				imageClassName: null,
-				closeClassName: null,
-				overlayClassName: null,
-				src: null
-			};
-			this.options = $.extend({}, options, _defaults3);
-			this.options = $.extend({}, options, _settings3);
-			this.options = $.extend({}, options, params);
-			this.close = function () {
-				jQuery('.' + options.modalClassName + ', .' + options.overlayClassName).fadeOut(_settings3.fadeOutSpeed, function () { jQuery(this).unbind().remove(); });
-			};
-			this.open = function () {
-				if (typeof options.src == 'function') {
-					options.src = options.src(sender);
-				} else {
-					options.src = options.src || _defaults3.src(sender);
-				}
-
-				var fileExt = /^.+\.((jpg)|(gif)|(jpeg)|(png)|(jpg))$/i;
-				var contentHTML = '';
-				if (fileExt.test(options.src)) {
-					contentHTML = '<div class="' + options.imageClassName + '"><img src="' + options.src + '"/></div>';
-
-				} else {
-					contentHTML = '<iframe width="' + options.width + '" height="' + options.height + '" frameborder="0" scrolling="yes" allowtransparency="true" src="' + options.src + '"></iframe>';
-				}
-				options.content = options.content || contentHTML;
-
-				if (jQuery('.' + options.modalClassName).length && jQuery('.' + options.overlayClassName).length) {
-					jQuery('.' + options.modalClassName).html(options.content);
-				} else {
-					$overlay = jQuery((_isIE63()) ? '<iframe src="BLOCKED SCRIPT\'<html></html>\';" scrolling="yes" frameborder="0" class="' + options.overlayClassName + '"></iframe><div class="' + options.overlayClassName + '"></div>' : '<div class="' + options.overlayClassName + '"></div>');
-					$overlay.hide().appendTo(options.parent);
-
-					$modal = jQuery('<div id="' + options.id + '" class="' + options.modalClassName + '" style="width:' + options.width + 'px; height:' + options.height + 'px; margin-top:-' + (options.height / 2) + 'px; margin-left:-' + (options.width / 2) + 'px;">' + options.content + '</div>');
-					$modal.hide().appendTo(options.parent);
-
-					$close = jQuery('<a class="' + options.closeClassName + '"></a>');
-					$close.appendTo($modal);
-
-					var overlayOpacity = _getOpacity3($overlay.not('iframe')) || options.overlayOpacity;
-					$overlay.fadeTo(0, 0).show().not('iframe').fadeTo(_settings3.fadeInSpeed, overlayOpacity);
-					$modal.fadeIn(_settings3.fadeInSpeed);
-					
-					//alert(options.message)
-					if(options.message==false){
-					//$close.click(function () { jQuery.modal().close(); location.href='https://halfback.cnaf.infn.it/casshib/shib/app4/login?service=https%3A%2F%2Fgridlab04.cnaf.infn.it%2Fc%2Fportal%2Flogin%3Fp_l_id%3D10671';});
-					$close.click(function () { jQuery.modal().close(); location.href='https://halfback.cnaf.infn.it/casshib/shib/app1/login?service=https%3A%2F%2Fflyback.cnaf.infn.it%2Fc%2Fportal%2Flogin%3Fp_l_id%3D10669';});
-					}else{
-						$close.click(function () { window.location.href='https://flyback.cnaf.infn.it/dirac'; });
-						$overlay.click(function () { window.location.href='https://flyback.cnaf.infn.it/dirac'; });
-					}
-					
-				}
-			};
-			return this;
-		};
-		_isIE63 = function () {
-			if (document.all && document.getElementById) {
-				if (document.compatMode && !window.XMLHttpRequest) {
-					return true;
-				}
-			}
-			return false;
-		};
-		_getOpacity3 = function (sender) {
-			$sender = jQuery(sender);
-			opacity = $sender.css('opacity');
-			filter = $sender.css('filter');
-
-			if (filter.indexOf("opacity=") >= 0) {
-				return parseFloat(filter.match(/opacity=([^)]*)/)[1]) / 100;
-			}
-			else if (opacity != '') {
-				return opacity;
-			}
-			return '';
-		};
-		_defaults3 = {
-			parent: 'body',
-			overlayOpacity: 85,
-			id: 'modal',
-			content: null,
-			width: 800,
-			height: 600,
-			modalClassName: 'modal-window',
-			imageClassName: 'modal-image',
-			closeClassName: 'close-window',
-			overlayClassName: 'modal-overlay',
-			src: function (sender) {
-				return jQuery(sender).attr('href');
-			}
-		};
-	})(jQuery);
 	
 </script>
-
-<style type="text/css">
-	#containerDirac {
-		box-shadow: 10px 10px 5px #888;
-		background-color: #e4e4e4;
-		border: 1px;
-		border-style: solid;
-		border-color: #c1c1c1;
-		border-radius: 5px;
-		padding: 5px;
-		margin-right: 9px;
-	}
-	
-	#presentationDirac  {
-		color: black;
-		font-size: 120%;
-		font-weight: bold;
-		border-bottom: 1px solid #CCCCCC;
-		width: 90%;
-		margin-bottom: 15px;
-		padding: 10px 0 0 10px;
-	}
-	
-	#contentDirac  {
-		margin-top: 15px;
-	}
-	.status {
-		height: 15px;
-		width: 15px;
-		border: 1px solid black;
-		float: left;
-		margin-right: 10px;
-	}
-	
-	#statusValue {
-		float: left;
-	}
-	
-	#failedStatus {
-		background-color: red;
-	}
-	
-	#doneStatus {
-		background-color: green;
-	}
-	
-	#receivedStatus {
-		background-color: grey;
-	}
-	
-	#waitingStatus {
-		background-color: orange;
-	}
-	
-	#runningStatus {
-		background-color: blue;
-	}
-	
-	#deletedStatus {
-		background-color: darkgrey;
-	}
-	
-	#reset {
-		clear: both;
-	}
-	
-	.rightAlign{
-		float: right;
-	}
-	
-	.modal-overlay {
-		position: fixed;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		height: 100%;
-		width: 100%;
-		margin: 0;
-		padding: 0;
-		background: url(/IGIPortalDIRAC-0.0.1/images/overlay2.png) repeat;
-		opacity: .85;
-		filter: alpha(opacity=85);
-		z-index: 101;
-	}
-	.modal-window {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		margin: 0;
-		padding: 0;
-		z-index: 102;
-		background: #fff;
-		border: solid 8px #000;
-		-moz-border-radius: 8px;
-		-webkit-border-radius: 8px;
-	}
-	.close-window {
-		position: absolute;
-		width: 47px;
-		height: 47px;
-		right: -23px;
-		top: -23px;
-		background: transparent url(/IGIPortalDIRAC-0.0.1/images/close-button2.png) no-repeat scroll right top;
-		text-indent: -99999px;
-		overflow: hidden;
-		cursor: pointer;
-	}
-</style>
 
 <div id="containerDirac">
 	<div id="presentationDirac">My Jobs</div>
@@ -316,6 +77,10 @@
 		<portlet:renderURL var="submitUrl">
 			<portlet:param name="myaction" value="showSubmitJob" />
 		</portlet:renderURL>
+		
+		<liferay-portlet:renderURL var="homeUrl">
+			<portlet:param name="myaction" value="showHome" />
+		</liferay-portlet:renderURL>
 		
 		<aui:fieldset>
 		<aui:column columnWidth="50">
@@ -369,8 +134,8 @@
 					className="it.italiangrid.portal.dirac.db.domain.Jobs"
 					keyProperty="jobId" modelVar="job">
 					
-					<liferay-ui:search-container-column-text name="Del">
-						<input name="jobToDel" type="checkbox"
+					<liferay-ui:search-container-column-text name="Del <input type='checkbox' onclick='setAll($(this));'/>">
+						<input class="deleteCheckbox" name="jobToDel" type="checkbox"
 							value="${job.jobId }"
 							onchange="viewOrHideDeleteButton('${job.jobId }');"></input>
 					</liferay-ui:search-container-column-text>
@@ -381,7 +146,7 @@
 								<portlet:param name="myaction" value="getJDL"/>
 								<portlet:param name="jobId" value="${job.jobId }"/>
 							</portlet:renderURL>
-					<a href="#" onclick="$(this).modal3({width:600, height:450, message:true, src: '${getJdlURLonName}'}).open();">${job.jobName }</a>
+					<a href="#" onclick="$(this).modal3({width:600, height:450, message:true, redirect:'${homeUrl}', src: '${getJdlURLonName}'}).open();">${job.jobName }</a>
 					</liferay-ui:search-container-column-text>
 					<liferay-ui:search-container-column-text name="Submission Time"
 						property="submissionTime" />	
@@ -425,7 +190,7 @@
 								<portlet:param name="myaction" value="getJDL"/>
 								<portlet:param name="jobId" value="${job.jobId }"/>
 							</portlet:renderURL>
-							<liferay-ui:icon image="history" message="JDL" url="javascript:$(this).modal3({width:600, height:450, message:true, src: '${getJdlURL}'}).open();" />
+							<liferay-ui:icon image="history" message="JDL" url="javascript:$(this).modal3({width:600, height:450, message:true, redirect:'${homeUrl}', src: '${getJdlURL}'}).open();" />
 							
 							<portlet:actionURL var="rescheduleURL">
 								<portlet:param name="myaction" value="rescheduleJob"/>

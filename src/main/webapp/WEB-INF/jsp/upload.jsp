@@ -1,7 +1,5 @@
 <%@ include file="/WEB-INF/jsp/init.jsp"%>
 
-
-
 <div id="containerDirac2">
 	<div id="presentationDirac">Upload Proxy</div>
 	<div id="contentDirac" style="margin-left:30px;">
