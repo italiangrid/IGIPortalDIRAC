@@ -76,6 +76,17 @@ public class HomeController {
 		return "error";
 	}
 	
+	/**
+	 * Display the home page.
+	 * 
+	 * @return Return the portlet home page.
+	 */
+	@RenderMapping(params="myaction=showHome")
+	public String showHomePage2(RenderRequest request){
+		return showHomePage(request);
+	}
+	
+	
 	@ModelAttribute("jobs")
 	public List<Jobs> getJobs(RenderRequest request){
 		try {

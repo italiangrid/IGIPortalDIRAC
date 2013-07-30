@@ -208,6 +208,7 @@ public class UploadCertificateController {
 				FileUtil.delete(new File(uploadCert.getCertificate()));
 				
 				SessionMessages.add(request, "upload-successufully");
+				response.setRenderParameter("myaction", "showSuccessPage");
 				return;
 			}
 		} catch(DiracException e) {
