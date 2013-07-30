@@ -95,4 +95,30 @@ public class HomeController {
 		
 		return null;
 	}
+	
+	@ModelAttribute("isAllJobsTerminate")
+	public boolean getAllJobsStatus(RenderRequest request){
+		try {
+			User user = PortalUtil.getUser(request);
+
+			if (user != null) {
+				log.info("User logged in.....");
+				UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
+				log.info(userInfo.getFirstName() + " " +userInfo.getLastName());
+				
+				List<Jobs> jobs = jobService.findByOwner(userInfo.getPersistentId());
+				
+				for (Jobs job : jobs) {
+					if(!job.getStatus().equals("Done")&&!job.getStatus().equals("Failed")&&!job.getStatus().equals("Deleted"))
+						return false;
+				}
+				
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
 }

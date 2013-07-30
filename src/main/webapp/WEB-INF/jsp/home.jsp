@@ -33,9 +33,13 @@
 	}
 	
 	$(document).ready(function() {
-		setTimeout(function(){
-			location.href='https://flyback.cnaf.infn.it/dirac';
-	    }, 20000);
+		alert(${isAllJobsTerminate});
+		alert(${isAllJobsTerminate}==false);
+		if(${isAllJobsTerminate}==false){
+			setTimeout(function(){
+				location.href='https://flyback.cnaf.infn.it/dirac';
+		    }, 20000);
+		}
 	});
 	
 	(function ($) {
