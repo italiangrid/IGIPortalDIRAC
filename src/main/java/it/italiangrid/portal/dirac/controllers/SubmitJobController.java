@@ -64,6 +64,15 @@ public class SubmitJobController {
 	public Jdl newJob(){
 		return new Jdl();
 	}
+	
+	@ModelAttribute("showUploadCert")
+	public boolean showUploadCert(RenderRequest request){
+		
+		if(request.getParameter("showUploadCert")!=null)
+			if(request.getParameter("showUploadCert").equals("true"))
+				return true;
+		return false;
+	}
 
 	@ModelAttribute("vos")
 	public List<Vo> getUserVos(RenderRequest request){

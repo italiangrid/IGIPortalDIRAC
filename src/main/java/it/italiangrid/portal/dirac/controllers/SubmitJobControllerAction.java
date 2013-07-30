@@ -219,9 +219,11 @@ public class SubmitJobControllerAction {
 				PortletConfig portletConfig = (PortletConfig)request.getAttribute(JavaConstants.JAVAX_PORTLET_CONFIG);
 				SessionMessages.add(request, portletConfig.getPortletName() + SessionMessages.KEY_SUFFIX_HIDE_DEFAULT_ERROR_MESSAGE);
 				
-				response.setRenderParameter("myaction", "showUploadCert");
+				response.setRenderParameter("showUploadCert", "true");
 				
-				return;
+//				response.setRenderParameter("myaction", "showUploadCert");
+				
+//				return;
 			}else{
 				if (e.getMessage().equals("submit-error")){
 					SessionErrors.add(request, "check-jdl");

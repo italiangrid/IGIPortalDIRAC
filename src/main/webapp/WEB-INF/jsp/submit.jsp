@@ -38,9 +38,200 @@
 		appendExecutable();
 		//appendInputSandbox();
 		});
+	
+	(function ($) {
+
+		/**********************************
+		* CUSTOMIZE THE DEFAULT SETTINGS
+		* Ex:
+		* var _settings = {
+		* 	id: 'modal',
+		* 	src: function(sender){
+		*		return jQuery(sender).attr('href');
+		*	},
+		* 	width: 800,
+		* 	height: 600
+		* }
+		**********************************/
+		var _settings3 = {
+			width: 800, // Use this value if not set in CSS or HTML
+			height: 600, // Use this value if not set in CSS or HTML
+			overlayOpacity: .85, // Use this value if not set in CSS or HTML
+			id: 'modal',
+			fadeInSpeed: 0,
+			fadeOutSpeed: 0
+		};
+
+		/**********************************
+		* DO NOT CUSTOMIZE BELOW THIS LINE
+		**********************************/
+		$.modal3 = function (options) {
+			return _modal3(this, options);
+		};
+		$.modal3.open = function () {
+			_modal3.open();
+		};
+		$.modal3.close = function () {
+			_modal3.close();
+		};
+		$.fn.modal3 = function (options) {
+			return _modal3(this, options);
+		};
+		_modal3 = function (sender, params) {
+			this.options = {
+				parent: null,
+				overlayOpacity: null,
+				id: null,
+				content: null,
+				width: null,
+				height: null,
+				message: false,
+				modalClassName: null,
+				imageClassName: null,
+				closeClassName: null,
+				overlayClassName: null,
+				src: null,
+				redirect: null
+			};
+			this.options = $.extend({}, options, _defaults3);
+			this.options = $.extend({}, options, _settings3);
+			this.options = $.extend({}, options, params);
+			this.close = function () {
+				jQuery('.' + options.modalClassName + ', .' + options.overlayClassName).fadeOut(_settings3.fadeOutSpeed, function () { jQuery(this).unbind().remove(); });
+			};
+			this.open = function () {
+				if (typeof options.src == 'function') {
+					options.src = options.src(sender);
+				} else {
+					options.src = options.src || _defaults3.src(sender);
+				}
+
+				var fileExt = /^.+\.((jpg)|(gif)|(jpeg)|(png)|(jpg))$/i;
+				var contentHTML = '';
+				if (fileExt.test(options.src)) {
+					contentHTML = '<div class="' + options.imageClassName + '"><img src="' + options.src + '"/></div>';
+
+				} else {
+					contentHTML = '<iframe width="' + options.width + '" height="' + options.height + '" frameborder="0" scrolling="yes" allowtransparency="true" src="' + options.src + '"></iframe>';
+				}
+				options.content = options.content || contentHTML;
+
+				if (jQuery('.' + options.modalClassName).length && jQuery('.' + options.overlayClassName).length) {
+					jQuery('.' + options.modalClassName).html(options.content);
+				} else {
+					$overlay = jQuery((_isIE63()) ? '<iframe src="BLOCKED SCRIPT\'<html></html>\';" scrolling="yes" frameborder="0" class="' + options.overlayClassName + '"></iframe><div class="' + options.overlayClassName + '"></div>' : '<div class="' + options.overlayClassName + '"></div>');
+					$overlay.hide().appendTo(options.parent);
+
+					$modal = jQuery('<div id="' + options.id + '" class="' + options.modalClassName + '" style="width:' + options.width + 'px; height:' + options.height + 'px; margin-top:-' + (options.height / 2) + 'px; margin-left:-' + (options.width / 2) + 'px;">' + options.content + '</div>');
+					$modal.hide().appendTo(options.parent);
+
+					$close = jQuery('<a class="' + options.closeClassName + '"></a>');
+					$close.appendTo($modal);
+
+					var overlayOpacity = _getOpacity3($overlay.not('iframe')) || options.overlayOpacity;
+					$overlay.fadeTo(0, 0).show().not('iframe').fadeTo(_settings3.fadeInSpeed, overlayOpacity);
+					$modal.fadeIn(_settings3.fadeInSpeed);
+					
+					//alert(options.message)
+					if(options.message==false){
+					//$close.click(function () { jQuery.modal().close(); location.href='https://halfback.cnaf.infn.it/casshib/shib/app4/login?service=https%3A%2F%2Fgridlab04.cnaf.infn.it%2Fc%2Fportal%2Flogin%3Fp_l_id%3D10671';});
+					$close.click(function () { jQuery.modal().close(); location.href='https://halfback.cnaf.infn.it/casshib/shib/app1/login?service=https%3A%2F%2Fflyback.cnaf.infn.it%2Fc%2Fportal%2Flogin%3Fp_l_id%3D10669';});
+					}else{
+						if(options.redirect!=null){
+							$close.click(function () { location.href=options.redirect; });
+							$overlay.click(function () { location.href=options.redirect; });
+						}else{
+							$close.click(function () { jQuery.modal().close()});
+							$overlay.click(function () { jQuery.modal().close(); });
+						}
+					}
+					
+				}
+			};
+			return this;
+		};
+		_isIE63 = function () {
+			if (document.all && document.getElementById) {
+				if (document.compatMode && !window.XMLHttpRequest) {
+					return true;
+				}
+			}
+			return false;
+		};
+		_getOpacity3 = function (sender) {
+			$sender = jQuery(sender);
+			opacity = $sender.css('opacity');
+			filter = $sender.css('filter');
+
+			if (filter.indexOf("opacity=") >= 0) {
+				return parseFloat(filter.match(/opacity=([^)]*)/)[1]) / 100;
+			}
+			else if (opacity != '') {
+				return opacity;
+			}
+			return '';
+		};
+		_defaults3 = {
+			parent: 'body',
+			overlayOpacity: 85,
+			id: 'modal',
+			content: null,
+			width: 800,
+			height: 600,
+			modalClassName: 'modal-window',
+			imageClassName: 'modal-image',
+			closeClassName: 'close-window',
+			overlayClassName: 'modal-overlay',
+			src: function (sender) {
+				return jQuery(sender).attr('href');
+			},
+			redirect: null
+		};
+	})(jQuery);
 </script>
 
 <style type="text/css">
+
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		margin: 0;
+		padding: 0;
+		background: url(/IGIPortalDIRAC-0.0.1/images/overlay2.png) repeat;
+		opacity: .85;
+		filter: alpha(opacity=85);
+		z-index: 101;
+	}
+	.modal-window {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		margin: 0;
+		padding: 0;
+		z-index: 102;
+		background: #fff;
+		border: solid 8px #000;
+		-moz-border-radius: 8px;
+		-webkit-border-radius: 8px;
+	}
+	.close-window {
+		position: absolute;
+		width: 47px;
+		height: 47px;
+		right: -23px;
+		top: -23px;
+		background: transparent url(/IGIPortalDIRAC-0.0.1/images/close-button2.png) no-repeat scroll right top;
+		text-indent: -99999px;
+		overflow: hidden;
+		cursor: pointer;
+	}
+
+
 	#containerDirac {
 		box-shadow: 10px 10px 5px #888;
 		background-color: #e4e4e4;
@@ -115,6 +306,9 @@
 				type="java.util.List<it.italiangrid.portal.dbapi.domain.Vo>"
 				scope="request" />
 		
+		<br/><br/>showUploadCert: <c:out value="${showUploadCert}"/><br/><br/>
+		
+	
 		
 		
 		<aui:form name="newJdl" action="${submitUrl }" commandName="jdl" enctype="multipart/form-data">
@@ -236,3 +430,22 @@
 		</aui:form>
 	</div>
 </div>
+
+
+<c:if test="${showUploadCert==true}">
+	<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>" var="popUpUrl">
+		<portlet:param name="myaction" value="showUploadCert" />
+	</liferay-portlet:renderURL>
+	
+	<liferay-portlet:renderURL var="homeUrl">
+		<portlet:param name="myaction" value="showHome" />
+	</liferay-portlet:renderURL>
+
+	<div style="display:none">
+		<form id="submitThis" action="javascript:$(this).modal3({width:800, height:400, message:true, redirect:'${homeUrl}', src: '${popUpUrl}'}).open(); return false;"></form>
+	</div>
+
+	<script>
+		$(this).modal3({width:800, height:400, message:true, redirect:'${homeUrl}', src: '${popUpUrl}'}).open();
+	</script>
+</c:if>
