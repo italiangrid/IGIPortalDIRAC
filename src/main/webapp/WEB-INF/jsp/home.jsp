@@ -33,8 +33,7 @@
 	}
 	
 	$(document).ready(function() {
-		alert(${isAllJobsTerminate});
-		alert(${isAllJobsTerminate}==false);
+		
 		if(${isAllJobsTerminate}==false){
 			setTimeout(function(){
 				location.href='https://flyback.cnaf.infn.it/dirac';
