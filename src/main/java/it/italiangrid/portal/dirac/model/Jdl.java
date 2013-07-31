@@ -26,10 +26,11 @@ public class Jdl {
 	private String wholeNodes;
 	private String smpGranularity;
 	private String vo;
+	private String requirements;
 	private List<String> parameterNames = Arrays.asList(new String[]{ "jobName", "executable", "arguments",
 		"inputSandbox", "outputSandboxRequest", "outputSandbox", "outputSandboxDestUri", "stdOutput", "stdError",
 		"inputData", "outputSE", "outputData", "outputPath", "parameters", "parameterStart",
-		"parameterStep", "cpuNumber", "hostNumber", "wholeNodes", "smpGranularity", "vo"});
+		"parameterStep", "cpuNumber", "hostNumber", "wholeNodes", "smpGranularity", "vo", "requirements"});
 
 	/**
 	 * Default constructor.
@@ -405,6 +406,20 @@ public class Jdl {
 		this.vo = vo;
 	}
 
+	/**
+	 * @return the requirements
+	 */
+	public String getRequirements() {
+		return requirements;
+	}
+
+	/**
+	 * @param requirements the requirements to set
+	 */
+	public void setRequirements(String requirements) {
+		this.requirements = requirements;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -511,14 +526,16 @@ public class Jdl {
 					string += "ParameterStep = " + parameterStep + ";\n";
 				}
 			} else {
-				string += "Parameters = {";
-				for (String s : parameters.split(";")) {
-					string += "\"" + s + "\", ";
+				if(!parameters.isEmpty()){
+					string += "Parameters = {";
+					for (String s : parameters.split(";")) {
+						string += "\"" + s + "\", ";
+					}
+	
+					string = string.substring(0, string.length() - 2);
+	
+					string += "};\n";
 				}
-
-				string = string.substring(0, string.length() - 2);
-
-				string += "};\n";
 			}
 			string += "OutputSE = \"" + outputSE + "\";\n";
 		}
@@ -532,7 +549,10 @@ public class Jdl {
 			string += "WholeNodes = " + wholeNodes + ";\n";
 		}
 		if (smpGranularity != null && !smpGranularity.isEmpty()) {
-			string += "SMPGranularity = \"" + smpGranularity + "\";\n";
+			string += "SMPGranularity = " + smpGranularity + ";\n";
+		}
+		if (requirements != null && !requirements.isEmpty()) {
+			string += "Requirements = (" + requirements + ");\n";
 		}
 
 		return string;
@@ -559,10 +579,11 @@ public class Jdl {
 		case 14: this.parameterStart = (String) value; break;
 		case 15: this.parameterStep = (String) value; break;
 		case 16: this.cpuNumber = (String) value; break;
-		case 17: this.hostNumber = (String) value; System.out.println("hostNumber: " + hostNumber); break;
-		case 18: this.wholeNodes = (String) value; System.out.println("wholeNodes: " + wholeNodes); break;
+		case 17: this.hostNumber = (String) value; break;
+		case 18: this.wholeNodes = (String) value; break;
 		case 19: this.smpGranularity = (String) value; break;
 		case 20: this.vo = (String) value; break;
+		case 21: this.requirements = (String) value; break;
 		
 		}
 	}

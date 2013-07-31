@@ -97,7 +97,7 @@ public class HomeController {
 				UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
 				log.info(userInfo.getFirstName() + " " +userInfo.getLastName());
 				
-				return jobService.findByOwner(userInfo.getPersistentId());
+				return jobService.findByOwner(userInfo.getUsername());
 			}
 
 		} catch (Exception e) {

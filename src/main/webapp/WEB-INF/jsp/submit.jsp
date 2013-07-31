@@ -105,6 +105,9 @@
 					<div id="smpGranularityDiv" style="display: none;">
 						<aui:input type="text" label="SMP Granularity (MPI)" name="smpGranularity" value="${jdl.smpGranularity }"/>
 					</div>
+					<div id="requirementsDiv" style="display: none;">
+						<aui:input type="text" label="Requirements" name="requirements" value="${jdl.requirements }"/>
+					</div>
 					<div id="outputSandboxDiv" style="display: none;">
 						<aui:input type="text" label="Output Sandbox (For multiple files separate with ';')" name="outputSandboxRequest" value="${jdl.outputSandboxRequest }"/>
 					</div>
@@ -161,6 +164,12 @@
 					<div>
 					<a id="parameterStepadd" href="#parameterStepDiv" onclick="$('#parameterStepDiv').show(); setTimeout( function() { $('#parameterStepDiv input').focus(); }, 200 ); $('#parameterStepremove').show(); $('#parameterStepadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Step</a>
 					<a id="parameterStepremove" style="display: none;" href="#parameterStepDiv" onclick="$('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Step</a>
+					</div>
+					<hr/>
+					<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> REQUIREMENTS </label>
+					<div>
+					<a id="requirementsadd" href="#requirementsDiv" onclick="$('#requirementsDiv').show(); setTimeout( function() { $('#requirementsDiv input').focus(); }, 200 ); $('#requirementsremove').show(); $('#requirementsadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Requirements</a>
+					<a id="requirementsremove" style="display: none;" href="#requirementsDiv" onclick="$('#requirementsDiv').hide(); $('#requirementsadd').show(); $('#requirementsremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Requirements</a>
 					</div>
 				</aui:fieldset>	
 			</div>

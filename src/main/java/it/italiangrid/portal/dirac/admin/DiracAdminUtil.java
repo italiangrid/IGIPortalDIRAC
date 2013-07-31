@@ -264,8 +264,8 @@ public class DiracAdminUtil {
 			log.info("[Stdout] " + line);
 			if(line.contains("Illegal value for ParameterStart JDL field"))
 				throw new DiracException("submit-error");
-			if(line.contains("JobID = [")){
-				String[] ids = line.replace("JobID = [", "").replace("]", "").replaceAll(" ", "").split(",");
+			if(line.contains("JobID = ")){
+				String[] ids = line.replace("JobID = ", "").replace("[", "").replace("]", "").replaceAll(" ", "").split(",");
 				for (String string : ids) {
 					jobIDs.add(Long.parseLong(string));
 				}
