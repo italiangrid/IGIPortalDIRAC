@@ -178,7 +178,7 @@ public class UploadCertificateController {
 				CertificateUtils.saveCertificate(usercertOS, chain.getCertificate(), Encoding.PEM);
 				CertificateUtils.savePrivateKey(userkeyOS, chain.getKey(), Encoding.PEM, "AES-256-CBC", uploadCert.getPassword().toCharArray(),true);
 				
-				DiracTask diracTask = new DiracTask(userCert.getAbsolutePath(), userKey.getAbsolutePath(), uploadCert.getPassword(), user.getEmailAddress(), DNHandler.getSubject(chain.getCertificate()).getX500(), user.getScreenName());
+				DiracTask diracTask = new DiracTask(userCert.getAbsolutePath(), userKey.getAbsolutePath(), uploadCert.getPassword(), user.getEmailAddress(), DNHandler.getSubject(chain.getCertificate()).getX500(), user.getScreenName(), DiracTask.ADD_TASK);
 				
 				DiracTaskJSON diracTaskJSON = new DiracTaskJSON(diracTask);
 				

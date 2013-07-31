@@ -22,7 +22,7 @@ public class CheckerBackup implements Runnable {
 	 */
 	public void run() {
 
-		log.info("Starting storing the notificatio queue...");
+		log.info("Starting storing the notification queue...");
 
 		try {
 

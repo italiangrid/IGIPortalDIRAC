@@ -271,8 +271,15 @@ public class Checker implements Runnable{
 	 * @param jobId - the job to get the information.
 	 * @return the status.
 	 * @throws SQLException
+	 * @throws ClassNotFoundException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws DiracException 
 	 */
-	private String getStatus(long jobId) throws SQLException {
+	private String getStatus(long jobId) throws SQLException, DiracException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+		
+		if(conn.isClosed())
+			conn = openConnetion();
 		
 		Statement statement = conn.createStatement();
 		
@@ -301,7 +308,8 @@ public class Checker implements Runnable{
 	public static void closeConnection(){
 		try {
 			if(conn!=null)
-				conn.close();
+				if(!conn.isClosed())
+					conn.close();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
