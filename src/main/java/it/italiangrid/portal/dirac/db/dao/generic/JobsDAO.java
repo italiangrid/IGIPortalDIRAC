@@ -8,4 +8,6 @@ public interface JobsDAO extends GenericDAO<Jobs, Long>{
 
 	List<Jobs> findByOwner(String owner);
 
+	List<Jobs> findByOwnerDN(String dn);
+
 }

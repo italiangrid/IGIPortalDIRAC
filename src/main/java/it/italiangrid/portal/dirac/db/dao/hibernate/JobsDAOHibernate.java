@@ -18,4 +18,10 @@ public class JobsDAOHibernate extends GenericHibernateDAO<Jobs, Long> implements
 				Restrictions.sqlRestriction("1=1 ORDER BY jobId DESC"));
 	}
 
+	public List<Jobs> findByOwnerDN(String dn) {
+		
+		return findByCriteria(Restrictions.eq("ownerDn", dn),
+				Restrictions.sqlRestriction("1=1 ORDER BY jobId DESC"));
+	}
+
 }

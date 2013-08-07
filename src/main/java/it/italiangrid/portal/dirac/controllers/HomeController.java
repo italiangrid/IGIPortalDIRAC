@@ -1,15 +1,19 @@
 package it.italiangrid.portal.dirac.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.portlet.RenderRequest;
 
+import it.italiangrid.portal.dbapi.domain.Certificate;
 import it.italiangrid.portal.dbapi.domain.UserInfo;
 import it.italiangrid.portal.dbapi.services.CertificateService;
 import it.italiangrid.portal.dbapi.services.UserInfoService;
 import it.italiangrid.portal.dirac.db.domain.Jobs;
 import it.italiangrid.portal.dirac.db.service.JobsService;
 import it.italiangrid.portal.dirac.db.service.ProxiesService;
+import it.italiangrid.portal.dirac.exception.DiracException;
+import it.italiangrid.portal.dirac.util.DiracConfig;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +101,19 @@ public class HomeController {
 				UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
 				log.info(userInfo.getFirstName() + " " +userInfo.getLastName());
 				
-				return jobService.findByOwner(userInfo.getUsername());
+				List<Certificate> certs = new ArrayList<Certificate>();
+				
+				certs = certificateService.findById(userInfo.getUserId());
+				
+				List<Jobs> jobs = new ArrayList<Jobs>();
+				
+				for (Certificate certificate : certs) {
+					
+					jobs.addAll(jobService.findByOwnerDN(certificate.getSubject()));
+					
+				}
+				
+				return jobs;
 			}
 
 		} catch (Exception e) {
@@ -117,7 +133,17 @@ public class HomeController {
 				UserInfo userInfo = userInfoService.findByMail(user.getEmailAddress());
 				log.info(userInfo.getFirstName() + " " +userInfo.getLastName());
 				
-				List<Jobs> jobs = jobService.findByOwner(userInfo.getPersistentId());
+				List<Certificate> certs = new ArrayList<Certificate>();
+				
+				certs = certificateService.findById(userInfo.getUserId());
+				
+				List<Jobs> jobs = new ArrayList<Jobs>();
+				
+				for (Certificate certificate : certs) {
+					
+					jobs.addAll(jobService.findByOwnerDN(certificate.getSubject()));
+					
+				}
 				
 				for (Jobs job : jobs) {
 					if(!job.getStatus().equals("Done")&&!job.getStatus().equals("Failed")&&!job.getStatus().equals("Deleted"))
@@ -131,5 +157,15 @@ public class HomeController {
 		}
 		
 		return true;
+	}
+	
+	@ModelAttribute("reloadPage")
+	public String getReloadPage(){
+		try {
+			return DiracConfig.getProperties("Dirac.properties", "dirac.reload.page");
+		} catch (DiracException e) {
+			e.printStackTrace();
+		}
+		return "https://portal.italiangrid.it/job";
 	}
 }

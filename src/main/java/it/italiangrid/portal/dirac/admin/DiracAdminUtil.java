@@ -77,7 +77,7 @@ public class DiracAdminUtil {
 		
 		String dn = certificateService.findById(userInfo.getUserId()).get(0).getSubject();
 		
-		String[] cmd = {"dirac-admin-add-user", "-N", userInfo.getPersistentId(), "-D", dn, "-M", userInfo.getMail(), "-G", "user"};
+		String[] cmd = {"dirac-admin-add-user", "-N", userInfo.getUsername(), "-D", dn, "-M", userInfo.getMail(), "-G", "user"};
 		
 		String logcmd = "";
 		

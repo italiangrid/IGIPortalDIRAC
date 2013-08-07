@@ -50,4 +50,10 @@ public class JobsServiceImpl implements JobsService {
 		// TODO Auto-generated method stub
 		return jobsDAO.findByOwner(owner);
 	}
+	
+	@Transactional
+	public List<Jobs> findByOwnerDN(String dn) {
+		// TODO Auto-generated method stub
+		return jobsDAO.findByOwnerDN(dn);
+	}
 }

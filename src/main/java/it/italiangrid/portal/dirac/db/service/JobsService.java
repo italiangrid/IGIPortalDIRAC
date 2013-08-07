@@ -15,5 +15,7 @@ public interface JobsService {
 	public List<Jobs> getAllJobs();
 	
 	public List<Jobs> findByOwner(String owner);
+	
+	public List<Jobs> findByOwnerDN(String dn);
 
 }

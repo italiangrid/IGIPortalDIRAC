@@ -48,7 +48,7 @@
 		
 		if(${isAllJobsTerminate}==false){
 			setTimeout(function(){
-				location.href='https://flyback.cnaf.infn.it/dirac';
+				location.href='${reloadPage}';
 		    }, 20000);
 		}
 	});
@@ -94,7 +94,7 @@
 		<aui:column columnWidth="50">
 			<aui:form id="refresh" name="refresh">
 				<aui:button-row >
-					<aui:button style="float: right;" type="button" value="Refresh" onClick="location.href='https://flyback.cnaf.infn.it/dirac';"/>
+					<aui:button style="float: right;" type="button" value="Refresh" onClick="location.href='${reloadPage}';"/>
 				</aui:button-row>
 			</aui:form>
 		</aui:column>
