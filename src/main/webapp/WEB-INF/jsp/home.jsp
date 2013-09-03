@@ -179,7 +179,7 @@
 					<liferay-ui:search-container-column-text name="Actions">
 					
 						<liferay-ui:icon-menu>
-							<c:if test="${job.status == 'Done' }">
+							<c:if test="${job.status == 'Done' || job.minorStatus == 'Application Finished With Errors'}">
 								<portlet:resourceURL  var="outpuURL" escapeXml="false" id="getOutputZipFile">
 									<portlet:param name="jobId" value="${job.jobId }"/>
 								</portlet:resourceURL>
