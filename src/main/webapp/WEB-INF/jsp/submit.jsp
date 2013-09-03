@@ -33,6 +33,17 @@
 	function appendInputSandbox(){
 		$("#inputSanboxDiv .aui-field-element").append(" <a href=\"#inputSanboxDiv\" onClick=\"$('#inputSanboxDiv').hide(); deleteAll(); count = -1;\"><img src=\"<%=request.getContextPath()%>/images/NewDelete.png\" width=\"14\" height=\"14\" /></a><div id=\"addFile\"> </div>");
 	}
+	
+	function changeMoreHelpVisibility(divId, linkText){
+		if ($('#'+divId).css('display') == 'none') {
+			$('#'+divId).show();
+			linkText.text('Less');
+		}else{
+			$('#'+divId).hide();
+			linkText.text('More');
+		}
+	}
+	
 	$(document).ready(function() {
 		appendExecutable();
 		//appendInputSandbox();
@@ -86,6 +97,10 @@
 					</div>
 					<div id="parametersDiv" style="display: none;">
 						<aui:input type="text" label="Parameters" name="parameters" value="${jdl.parameters }" />
+						<div class="help">
+							<strong>Help:</strong> Where you want to use the job specific job parameter use '%s', it will replaced by the specific parameter during the job submission. <a href="#moreHelpParameters" onclick="changeMoreHelpVisibility('moreHelpParameters', $(this));">More</a>
+							<div id="moreHelpParameters" class="moreHelp">Specify the number of parameters and use the Parameter Start and Parameter Step or specify a parameters list separated by <strong>";"</strong>.</div>
+						</div>
 					</div>
 					<div id="parameterStartDiv" style="display: none;">
 						<aui:input type="text" label="Parameter Start" name="parameterStart" value="${jdl.parameterStart }"/>
@@ -101,15 +116,25 @@
 					</div>
 					<div id="wholeNodesDiv" style="display: none;">
 						<aui:input type="text" label="Whole Nodes (MPI)" name="wholeNodes" value="${jdl.wholeNodes }"/>
+						<div class="help">
+							<strong>Help:</strong> Specify True o False. 
+						</div>
 					</div>
 					<div id="smpGranularityDiv" style="display: none;">
 						<aui:input type="text" label="SMP Granularity (MPI)" name="smpGranularity" value="${jdl.smpGranularity }"/>
 					</div>
 					<div id="requirementsDiv" style="display: none;">
-						<aui:input type="text" label="Requirements" name="requirements" value="${jdl.requirements }"/>
+						<aui:input type="textarea" cols="80" rows ="5" label="Requirements" name="requirements" value="${jdl.requirements }"/>
+						<div class="help">
+							<strong>Example:</strong> (other.GlueHostMainMemoryRAMSize>1024)&&(GlueCEStateFreeCPUs>2) <a href="#moreHelpRequirements" onclick="changeMoreHelpVisibility('moreHelpRequirements', $(this));">More</a>
+							<div id="moreHelpRequirements" class="moreHelp">Not specify a specific CE or queue.</div>
+						</div>
 					</div>
 					<div id="outputSandboxDiv" style="display: none;">
-						<aui:input type="text" label="Output Sandbox (For multiple files separate with ';')" name="outputSandboxRequest" value="${jdl.outputSandboxRequest }"/>
+						<aui:input type="text" label="Output Sandbox" name="outputSandboxRequest" value="${jdl.outputSandboxRequest }"/>
+						<div class="help">
+							<strong>Help:</strong> For multiple files separate with <strong>";"</strong>. 
+						</div>
 					</div>
 					<div id="inputSanboxDiv" style="display: none;">
 						<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> Input SandBox </label>
@@ -154,12 +179,12 @@
 					<hr/>
 					<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> PARAMETRIC </label>
 					<div>
-					<a id="parametersadd" href="#parametersDiv" onclick="$('#parametersDiv').show(); $('#parametersremove').show(); $('#parametersadd').hide(); alert('Provide a number or a list \'semicolon\' separated.\nUse \'%s\' where you want your parameter is placed.'); setTimeout( function() { $('#parametersDiv input').focus(); }, 200 );"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameters</a>
-					<a id="parametersremove" style="display: none;" href="#parametersDiv" onclick="$('#parametersDiv').hide(); $('#parametersadd').show(); $('#parametersremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameters</a>
+					<a id="parametersadd" href="#parametersDiv" onclick="$('#parametersDiv').show(); $('#parametersremove').show(); $('#parametersadd').hide(); setTimeout( function() { $('#parametersDiv input').focus(); }, 200 );"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameters</a>
+					<a id="parametersremove" style="display: none;" href="#parametersDiv" onclick="$('#parametersDiv').hide(); $('#parametersadd').show();  $('#parametersremove').hide(); $('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); $('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameters</a>
 					</div>
 					<div>
 					<a id="parameterStartadd" href="#parameterStartDiv" onclick="$('#parameterStartDiv').show(); setTimeout( function() { $('#parameterStartDiv input').focus(); }, 200 ); $('#parameterStartremove').show(); $('#parameterStartadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Start</a>
-					<a id="parameterStartremove" style="display: none;" href="#parameterStartDiv" onclick="$('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Start</a>
+					<a id="parameterStartremove" style="display: none;" href="#parameterStartDiv" onclick="$('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); "><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Start</a>
 					</div>
 					<div>
 					<a id="parameterStepadd" href="#parameterStepDiv" onclick="$('#parameterStepDiv').show(); setTimeout( function() { $('#parameterStepDiv input').focus(); }, 200 ); $('#parameterStepremove').show(); $('#parameterStepadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Step</a>

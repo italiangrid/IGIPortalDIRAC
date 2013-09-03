@@ -135,3 +135,27 @@ margin: 10px;
 .rightAlign{
 	float: right;
 }
+
+.help{
+	width: 80%;
+	color: #606060;
+	font-size: 11px;
+	text-align: justify;
+}
+
+.help a{
+	color: #0066CC;
+}
+
+.help a:hover{
+	color: #0066CC;
+	text-decoration: none;
+}
+
+.help a:visited{
+	color: #0066CC;
+}
+
+.moreHelp{
+	display: none;
+}
