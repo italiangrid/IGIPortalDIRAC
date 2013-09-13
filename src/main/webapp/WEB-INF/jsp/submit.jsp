@@ -79,6 +79,7 @@
 					<div id="argumentsDiv">
 						<aui:input type="text" label="Arguments" name="arguments" value="${jdl.arguments }"/>
 					</div>
+					<c:if test="${fn:length(vos)>1 }">
 					<label for="selectVO"><strong>VO</strong></label><br/>
 					<select id="selectVO" name="vo">
 					
@@ -92,6 +93,10 @@
 						</c:forEach>
 					
 					</select>
+					</c:if>
+					<c:if test="${fn:length(vos)==1 }">
+						<aui:input type="hidden" name="vo" value="${vos[0].vo }"/>
+					</c:if>
 					
 					<aui:input type="hidden" name="myProxyServer" value="${jdl.myProxyServer }"/>
 					<aui:input type="hidden" name="settedPath" value="${jdl.path }"/>
@@ -125,10 +130,19 @@
 							<a href="#addFile" onclick="$('#parametersDiv').hide(); $('#parametersadd').show();  $('#parametersremove').hide(); $('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); $('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide(); $('#parametersDiv input').val(''); $('#parameterStartDiv input').val(''); $('#parameterStepDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /></a>
 						</div>
 						<div style="clear: both;"></div>
-						<div class="help">
-							<strong>Help:</strong> Where you want to use the job specific job parameter use '%s', it will replaced by the specific parameter during the job submission. <a href="#moreHelpParameters" onclick="changeMoreHelpVisibility('moreHelpParameters', $(this));">More</a>
-							<div id="moreHelpParameters" class="moreHelp">Specify the number of parameters and use the Parameter Start and Parameter Step or specify a parameters list separated by <strong>";"</strong>.</div>
+						<div class="help" style="float: left; width: 80%;">
+							<strong>Help:</strong> Parameters can be a list or a number. <a href="#moreHelpParameters" onclick="changeMoreHelpVisibility('moreHelpParameters', $(this));">More</a>
+							<div id="moreHelpParameters" class="moreHelp">
+								<ul>
+									<li>A list of strings or numbers separate by ";". eg. 1;2;3</li>
+									<li>An integer (eg. 100), in this case the attributes <a href="#parameterStartDiv" onclick="$('#parameterStartDiv').show(); setTimeout( function() { $('#parameterStartDiv input').focus(); }, 200 ); $('#parameterStartremove').show(); $('#parameterStartadd').hide();">Parameter Start</a> (eg. 20) and <a href="#parameterStartDiv" onclick="$('#parameterStepDiv').show(); setTimeout( function() { $('#parameterStepDiv input').focus(); }, 200 ); $('#parameterStepremove').show(); $('#parameterStepadd').hide();">Parameter Step</a> (eg. 2) must be defined as integers to create the list of job parameters.</li>
+								</ul>
+								The other JDL attributes can contain "%s" placeholder. For each generated job this placeholder will be replaced by one of the values in the Parameters list. (eg. Job Name = "%s_parametric";) </br>
+								<a href="https://github.com/DIRACGrid/DIRAC/wiki/JobManagementAdvanced" target="_blank">Dirac Wiki</a>
+							</div>
 						</div>
+						
+						
 					</div>
 					
 					<div id="parameterStartDiv" style="display: none;">
@@ -185,7 +199,7 @@
 						</div>
 						<div style="clear: both;"></div>
 						<div class="help">
-							<strong>Help:</strong> Specify True or False. 
+							<strong>Help:</strong> True or False. 
 						</div>
 					</div>
 					
@@ -210,8 +224,8 @@
 						</div>
 						<div style="clear: both;"></div>
 						<div class="help">
-							<strong>Example:</strong> (other.GlueHostMainMemoryRAMSize>1024)&&(GlueCEStateFreeCPUs>2) <a href="#moreHelpRequirements" onclick="changeMoreHelpVisibility('moreHelpRequirements', $(this));">More</a>
-							<div id="moreHelpRequirements" class="moreHelp">Not specify a specific CE or queue but use the the <a href="#siteDiv" onclick="$('#sitesDiv').show(); setTimeout( function() { $('#sitesDiv input').focus(); }, 200 ); $('#sitesremove').show(); $('#sitesadd').hide();">Site</a> field.</div>
+							<strong>Example:</strong> (other.GlueHostMainMemoryRAMSize>1024)&&(GlueCEStateFreeCPUs>2)</br>
+							Do not specify a target CE or queue, but use the <a href="#siteDiv" onclick="$('#sitesDiv').show(); setTimeout( function() { $('#sitesDiv input').focus(); }, 200 ); $('#sitesremove').show(); $('#sitesadd').hide();">Site</a> field.
 						</div>
 					</div>
 					
@@ -247,7 +261,7 @@
 						</div>
 						<div style="clear: both;"></div>
 						<div class="help">
-							<strong>Help:</strong> For multiple files separate with <strong>";"</strong>. 
+							<strong>Help:</strong> Separate with <strong>";"</strong> for multiple files. 
 						</div>
 					</div>
 					

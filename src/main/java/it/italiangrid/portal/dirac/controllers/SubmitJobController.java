@@ -57,6 +57,7 @@ public class SubmitJobController {
 	
 	@ModelAttribute("jdl")
 	public Jdl newJob(RenderRequest request){
+		
 		try {
 			User user = PortalUtil.getUser(request);
 			if(request.getParameter("jobId")!=null){
