@@ -197,6 +197,12 @@
 								<portlet:param name="jobId" value="${job.jobId }"/>
 							</portlet:actionURL>
 							<liferay-ui:icon image="configuration" message="Reschedule" url="${rescheduleURL}" />
+							
+							<portlet:renderURL var="duplicateURL">
+								<portlet:param name="myaction" value="showSubmitJob"/>
+								<portlet:param name="jobId" value="${job.jobId }"/>
+							</portlet:renderURL>
+							<liferay-ui:icon image="copy" message="Duplicate" url="${duplicateURL}" />
 						
 							<portlet:actionURL var="deleteURL">
 								<portlet:param name="myaction" value="deleteJob"/>

@@ -9,9 +9,12 @@ import it.italiangrid.portal.dbapi.domain.UserInfo;
 import it.italiangrid.portal.dbapi.domain.Vo;
 import it.italiangrid.portal.dbapi.services.UserInfoService;
 import it.italiangrid.portal.dbapi.services.UserToVoService;
+import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
+import it.italiangrid.portal.dirac.db.service.JobJdlsService;
 import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.model.Jdl;
 import it.italiangrid.portal.dirac.util.DiracConfig;
+import it.italiangrid.portal.dirac.util.DiracUtil;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,9 @@ public class SubmitJobController {
 	@Autowired
 	private UserToVoService userToVoService;
 	
+	@Autowired
+	private JobJdlsService jobJdlsService;
+	
 	/**
 	 * Display the home page.
 	 * 
@@ -46,23 +52,44 @@ public class SubmitJobController {
 	 */
 	@RenderMapping(params="myaction=showSubmitJob")
 	public String showHomePage(){
-		
-		Jdl jdl = new Jdl();
-		
-		List<String> list = new ArrayList<String>();
-		
-		list.add(jdl.getStdOutput());
-		list.add(jdl.getStdError());
-		
-		jdl.setOutputSandbox(list);
-		
-		log.info("Test JDL:\n" + jdl);
 		return "submit";
 	}
 	
 	@ModelAttribute("jdl")
-	public Jdl newJob(){
+	public Jdl newJob(RenderRequest request){
+		try {
+			User user = PortalUtil.getUser(request);
+			if(request.getParameter("jobId")!=null){
+				
+				int jobId = Integer.parseInt(request.getParameter("jobId"));
+				log.info("jobId: " + jobId);
+				
+				Jdl jdl = DiracUtil.parseJdl(jobJdlsService.findById(jobId), user.getUserId());
+				
+				log.info("Duplicated jdl:");
+				log.info(jdl);
+			
+				return jdl;
+				
+				
+			}
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		
 		return new Jdl();
+		
+	}
+	
+	@ModelAttribute("sites")
+	public List<String> showSites(){
+		DiracAdminUtil util = new DiracAdminUtil();
+		try {
+			return util.getSite();
+		} catch (DiracException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	@ModelAttribute("showUploadCert")

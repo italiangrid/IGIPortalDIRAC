@@ -1,5 +1,9 @@
 package it.italiangrid.portal.dirac.util;
 
+import it.italiangrid.portal.dirac.db.domain.JobJdls;
+import it.italiangrid.portal.dirac.exception.DiracException;
+import it.italiangrid.portal.dirac.model.Jdl;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +22,17 @@ import org.apache.log4j.Logger;
 public class DiracUtil {
 	
 	private static final Logger log = Logger.getLogger(DiracUtil.class);
+	
+	public static Jdl parseJdl(JobJdls diracJdl, long userId) throws DiracException{
+		
+		Jdl myJdl = new Jdl();
+		
+		myJdl.copyJob(diracJdl, userId);
+		
+		myJdl.setJobName("Portal_Job_Copy_of_" + diracJdl.getJobId());
+		
+		return myJdl;
+	}
 
 	public static void delete(File file)
 	    	throws IOException{
