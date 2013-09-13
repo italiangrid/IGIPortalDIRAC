@@ -211,7 +211,7 @@
 						<div style="clear: both;"></div>
 						<div class="help">
 							<strong>Example:</strong> (other.GlueHostMainMemoryRAMSize>1024)&&(GlueCEStateFreeCPUs>2) <a href="#moreHelpRequirements" onclick="changeMoreHelpVisibility('moreHelpRequirements', $(this));">More</a>
-							<div id="moreHelpRequirements" class="moreHelp">Not specify a specific CE or queue.</div>
+							<div id="moreHelpRequirements" class="moreHelp">Not specify a specific CE or queue but use the the <a href="#siteDiv" onclick="$('#sitesDiv').show(); setTimeout( function() { $('#sitesDiv input').focus(); }, 200 ); $('#sitesremove').show(); $('#sitesadd').hide();">Site</a> field.</div>
 						</div>
 					</div>
 					
