@@ -1,6 +1,11 @@
 package it.italiangrid.portal.dirac.controllers;
 
+import java.io.File;
+import java.io.IOException;
+
 import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
+import it.italiangrid.portal.dirac.util.DiracUtil;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletConfig;
 
@@ -12,6 +17,7 @@ import org.springframework.web.portlet.bind.annotation.ActionMapping;
 
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
+import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
@@ -113,8 +119,20 @@ public class JobActionController {
 	}
 	
 	@ActionMapping(params = "myaction=goHome")
-	public void goHome(){
+	public void goHome(ActionRequest request){
 		
+		log.info(request.getParameter("settedPath"));
+		
+		if(!request.getParameter("settedPath").isEmpty()){
+			File dir = new File(request.getParameter("settedPath"));
+			
+			if(dir.exists())
+				try {
+					DiracUtil.delete(dir);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
 		return;
 
 	}

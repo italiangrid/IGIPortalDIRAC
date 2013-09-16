@@ -151,7 +151,7 @@
 							<aui:input type="text" label="Parameter Start" name="parameterStart" value="${jdl.parameterStart }"/>
 						</div>
 						<div style="float: left; margin-top: 32px; margin-left: 4px;">
-							<a href="#addFile" onclick="$('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); $('#parameterStartDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /></a>
+							<a href="#addFile" onclick="$('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); $('#parameterStartDiv input').val(''); $('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide(); $('#parameterStepDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /></a>
 						</div>
 						<div style="clear: both;"></div>
 					</div>
@@ -162,7 +162,7 @@
 							<aui:input type="text" label="Parameter Step" name="parameterStep" value="${jdl.parameterStep }"/>
 						</div>
 						<div style="float: left; margin-top: 32px; margin-left: 4px;">
-							<a href="#addFile" onclick="$('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide(); $('#parameterStepDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /></a>
+							<a href="#addFile" onclick="$('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); $('#parameterStartDiv input').val(''); $('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide(); $('#parameterStepDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /></a>
 						</div>
 						<div style="clear: both;"></div>
 					</div>
@@ -331,12 +331,12 @@
 					<a id="parametersremove" style="display: none;" href="#parametersDiv" onclick="$('#parametersDiv').hide(); $('#parametersadd').show();  $('#parametersremove').hide(); $('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); $('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide(); $('#parametersDiv input').val(''); $('#parameterStartDiv input').val(''); $('#parameterStepDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameters</a>
 					</div>
 					<div>
-					<a id="parameterStartadd" href="#parameterStartDiv" onclick="$('#parameterStartDiv').show(); setTimeout( function() { $('#parameterStartDiv input').focus(); }, 200 ); $('#parameterStartremove').show(); $('#parameterStartadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Start</a>
-					<a id="parameterStartremove" style="display: none;" href="#parameterStartDiv" onclick="$('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); $('#parameterStartDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Start</a>
+					<a id="parameterStartadd" href="#parameterStartDiv" onclick="$('#parametersDiv').show(); $('#parametersremove').show(); $('#parametersadd').hide(); $('#parameterStepDiv').show(); $('#parameterStepremove').show(); $('#parameterStepadd').hide(); $('#parameterStartDiv').show(); setTimeout( function() { $('#parameterStartDiv input').focus(); }, 200 ); $('#parameterStartremove').show(); $('#parameterStartadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Start</a>
+					<a id="parameterStartremove" style="display: none;" href="#parameterStartDiv" onclick="$('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); $('#parameterStartDiv input').val(''); $('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide(); $('#parameterStepDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Start</a>
 					</div>
 					<div>
-					<a id="parameterStepadd" href="#parameterStepDiv" onclick="$('#parameterStepDiv').show(); setTimeout( function() { $('#parameterStepDiv input').focus(); }, 200 ); $('#parameterStepremove').show(); $('#parameterStepadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Step</a>
-					<a id="parameterStepremove" style="display: none;" href="#parameterStepDiv" onclick="$('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide(); $('#parameterStepDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Step</a>
+					<a id="parameterStepadd" href="#parameterStepDiv" onclick="$('#parametersDiv').show(); $('#parametersremove').show(); $('#parametersadd').hide(); $('#parameterStartDiv').show(); $('#parameterStartremove').show(); $('#parameterStartadd').hide(); $('#parameterStepDiv').show(); setTimeout( function() { $('#parameterStepDiv input').focus(); }, 200 ); $('#parameterStepremove').show(); $('#parameterStepadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameter Step</a>
+					<a id="parameterStepremove" style="display: none;" href="#parameterStepDiv" onclick="$('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); $('#parameterStartDiv input').val(''); $('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide(); $('#parameterStepDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Parameter Step</a>
 					</div>
 					<hr/>
 					<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> REQUIREMENTS </label>
@@ -355,6 +355,7 @@
 			<aui:button type="submit" value="Submit"/>
 			<portlet:actionURL var="goHome">
 				<portlet:param name="myaction" value="goHome"></portlet:param>
+				<portlet:param name="settedPath" value="${jdl.path }"></portlet:param>
 			</portlet:actionURL>
 			<aui:button type="button" value="Back" onClick="${goHome }"/>
 			</aui:button-row>
