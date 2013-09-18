@@ -2,8 +2,6 @@
  * 
  */
 /**
- * Test
- * 
  * @author dmichelotto
  *
  */
