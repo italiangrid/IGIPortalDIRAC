@@ -17,7 +17,6 @@ import org.springframework.web.portlet.bind.annotation.ActionMapping;
 
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
