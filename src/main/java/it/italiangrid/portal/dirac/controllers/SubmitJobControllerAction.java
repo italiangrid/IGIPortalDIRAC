@@ -57,23 +57,48 @@ public class SubmitJobControllerAction {
 				 * Prepare temp folder for submission
 				 */
 				
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
-				Calendar cal = new GregorianCalendar();
-				Date now = cal.getTime();
+				UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
 				
-				String userPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId();
-				String tmpDir = "JDL_"+sdf.format(now);
-				String path = userPath + "/DIRAC/jdls/"+tmpDir;
+				String path;
+				
+				log.info(uploadRequest.getParameter("settedPath")!=null?uploadRequest.getParameter("settedPath"):"is null");
+				
+				if(uploadRequest.getParameter("settedPath")!=null && !uploadRequest.getParameter("settedPath").isEmpty()){
+				
+					path = uploadRequest.getParameter("settedPath");
+					log.info("existing temp folder:" + path);
+				
+				}else{
+					
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+					Calendar cal = new GregorianCalendar();
+					Date now = cal.getTime();
+					
+					
+					String tmpDir = "JDL_"+sdf.format(now);
+					String userPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId();
+					path = userPath + "/DIRAC/jdls/"+tmpDir;
+					log.info("create temp folder");
+					
+				}
+				
+				
 				
 				File jdlFolder = new File(path);
-				jdlFolder.mkdirs();
+				
+				if(!jdlFolder.exists())
+					jdlFolder.mkdirs();
+				
+				jdl.setPath(path);
+				
+				log.info("temp folder: " + path);
 				
 				/*
 				 * Get inputSandbox and jdl parameters
 				 */
 				
 				List<String> inputSandbox = new ArrayList<String>();
-				UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
+				
 		        File tempFile;
 		        
 		        @SuppressWarnings("unchecked")
@@ -141,10 +166,26 @@ public class SubmitJobControllerAction {
 					             }
 		            	} else{
 			            	String value = uploadRequest.getParameter(parameter);
-					          
 			            	log.info(parameter +" = "+value);
-					        
-					        jdl.setParameter(parameter, value);
+			            	if(parameter.contains("executable")||parameter.contains("uploadedFile_")){
+			            		File check = new File(path + "/" + value);
+			            		
+			            		if(check.exists()){
+			            			log.info("Fonunded file: " + path+"/"+value);
+			            			inputSandbox.add(path+"/"+value);
+			            			log.info("File " + value + " inserted.");
+			            		}
+			            		if(parameter.contains("executable")){
+			            			
+							        
+							        jdl.setParameter(parameter, value);
+			            		}
+			            	}else{
+					          
+				            	
+						        
+						        jdl.setParameter(parameter, value);
+			            	}
 		            	}
 		            }
 		        }

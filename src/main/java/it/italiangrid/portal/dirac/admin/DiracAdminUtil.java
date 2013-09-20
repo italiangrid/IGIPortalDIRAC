@@ -139,16 +139,20 @@ public class DiracAdminUtil {
 		log.info("Execution Path: " + userPath);
 		log.info("Execute command: " + logcmd);
 		
-		List<Long> jobIDs = new ArrayList<Long>();
+		List<String> list = new ArrayList<String>();
 		
 		try {
-			execute(cmd, exePath, jobIDs);
+			execute(cmd, exePath, list);
 
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new DiracException("userAdd-execution-error");
 		}
+		List<Long> jobIDs = new ArrayList<Long>();
 		
+		for (String string : list) {
+			jobIDs.add(Long.parseLong(string));
+		}
 		return jobIDs;
 	}
 
@@ -247,7 +251,7 @@ public class DiracAdminUtil {
 		
 	}
 	
-	private boolean execute(String[] cmd, File path, List<Long> jobIDs) throws IOException, DiracException{
+	private boolean execute(String[] cmd, File path, List<String> list) throws IOException, DiracException{
 		
 		boolean status = true;
 		
@@ -264,11 +268,17 @@ public class DiracAdminUtil {
 			log.info("[Stdout] " + line);
 			if(line.contains("Illegal value for ParameterStart JDL field"))
 				throw new DiracException("submit-error");
+			if(line.contains("No value for key"))
+				throw new DiracException("submit-error"); 
+			if(list != null){
 			if(line.contains("JobID = ")){
 				String[] ids = line.replace("JobID = ", "").replace("[", "").replace("]", "").replaceAll(" ", "").split(",");
 				for (String string : ids) {
-					jobIDs.add(Long.parseLong(string));
+					list.add(string);
 				}
+			}else{
+				list.add(line);
+			}
 			}
 		}
 		output.close();
@@ -284,6 +294,45 @@ public class DiracAdminUtil {
 		brCleanUp.close();
 		
 		return status;
+		
+	}
+
+	public void getInputSandbox(String path, String jobId) throws DiracException {
+		File exeDir = new File(System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir"));
+		
+		String[] cmd = {"dirac-wms-job-get-input", "-D", path, jobId};
+		
+		log.info("Execute command: " + cmd);
+		
+		try {
+			execute(cmd, exeDir, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new DiracException("error-deleting-output");
+		}
+		
+	}
+	
+	public List<String> getSite() throws DiracException {
+		List<String> result = new ArrayList<String>();
+		result.add("ANY");
+		
+		File exeDir = new File(System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir"));
+		
+		String[] cmd = {"dirac-admin-get-site-mask"};
+		
+		log.info("Execute command: " + cmd);
+		
+		try {
+			execute(cmd, exeDir, result);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new DiracException("error-retrieving-sites");
+		}
+		
+		log.info("Sites: " + result);
+		
+		return result;
 		
 	}
 }

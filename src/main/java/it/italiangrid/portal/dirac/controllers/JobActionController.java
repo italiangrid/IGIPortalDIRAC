@@ -1,6 +1,11 @@
 package it.italiangrid.portal.dirac.controllers;
 
+import java.io.File;
+import java.io.IOException;
+
 import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
+import it.italiangrid.portal.dirac.util.DiracUtil;
+
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletConfig;
 
@@ -113,8 +118,20 @@ public class JobActionController {
 	}
 	
 	@ActionMapping(params = "myaction=goHome")
-	public void goHome(){
+	public void goHome(ActionRequest request){
 		
+		log.info(request.getParameter("settedPath"));
+		
+		if(!request.getParameter("settedPath").isEmpty()){
+			File dir = new File(request.getParameter("settedPath"));
+			
+			if(dir.exists())
+				try {
+					DiracUtil.delete(dir);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
 		return;
 
 	}

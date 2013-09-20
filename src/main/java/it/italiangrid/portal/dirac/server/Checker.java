@@ -267,7 +267,6 @@ public class Checker implements Runnable{
 	 */
 	private String getStatus(long jobId) throws SQLException, DiracException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		
-
 		if(conn==null||conn.isClosed())
 			conn = openConnetion();
 		
