@@ -831,7 +831,7 @@ public class Jdl {
 		    File[] content = originFolder.listFiles();
 		    for(int i = 0; i < content.length; i++) {
 		        content[i].renameTo(new File(path+"/"+content[i].getName()));
-		        log.info("File " + content[i].getName() + "moved:\nFrom: " + originFolder.getAbsolutePath() + "\nTo:   " + content[i].getAbsolutePath());
+		        log.info("File " + content[i].getName() + "moved:\nFrom: " + originFolder.getAbsolutePath() + "\nTo:   " + path+"/"+content[i].getName());
 		    }
 		}
 		
