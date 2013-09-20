@@ -1,7 +1,6 @@
 package it.italiangrid.portal.dirac.server;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,12 +27,12 @@ public class CheckerService implements ServletContextListener {
 	/**
 	 * The executor for the thread management.
 	 */
-	private ExecutorService executor;
+	private ScheduledExecutorService scheduler  = Executors.newSingleThreadScheduledExecutor();;
 	
 	/**
 	 * The scheduler for the thread backup.
 	 */
-	private ScheduledExecutorService scheduler;
+	private ScheduledExecutorService schedulerBackup  = Executors.newSingleThreadScheduledExecutor();;
 
 	/**
 	 * Kill the Checker thread.
@@ -50,7 +49,8 @@ public class CheckerService implements ServletContextListener {
 		
 		Checker.closeConnection();
 		
-		executor.shutdownNow();
+		scheduler.shutdownNow();
+		schedulerBackup.shutdownNow();
 	}
 
 	/**
@@ -60,13 +60,21 @@ public class CheckerService implements ServletContextListener {
 		
 		log.info("Start the Checker Service.");
 		
-		executor = Executors.newSingleThreadExecutor();
-		executor.execute(new Checker());
+		try {
+			Checker.load();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		scheduler.scheduleAtFixedRate(new Checker(), 0, 10, TimeUnit.SECONDS);
 		
 		log.info("Start the Checker Backup Service.");
 		
-		scheduler = Executors.newSingleThreadScheduledExecutor();
-		scheduler.scheduleAtFixedRate(new CheckerBackup(), 0, 10, TimeUnit.MINUTES);
+		schedulerBackup.scheduleAtFixedRate(new CheckerBackup(), 0, 20, TimeUnit.SECONDS);
 		
 	}
 

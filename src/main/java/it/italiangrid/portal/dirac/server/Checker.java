@@ -57,7 +57,8 @@ public class Checker implements Runnable{
 		try {
 			datFile = new File(contextPath + "/content/" + DiracConfig.getProperties("Dirac.properties", "dirac.checker.store"));
 		} catch (DiracException e) {
-			datFile = new File(contextPath + "/content/checker.dat");
+//			datFile = new File(contextPath + "/content/checker.dat");
+			datFile = new File("/opt/test/checker.dat");
 		}
 		
 		log.info("Backup file: " + datFile.getAbsolutePath());
@@ -94,7 +95,8 @@ public class Checker implements Runnable{
 		try {
 			datFile = new File(contextPath + "/content/" + DiracConfig.getProperties("Dirac.properties", "dirac.checker.store"));
 		} catch (DiracException e) {
-			datFile = new File(contextPath + "/content/checker.dat");
+//			datFile = new File(contextPath + "/content/checker.dat");
+			datFile = new File("/opt/test/checker.dat");
 		}
 			
 		log.info("Backup file: " + datFile.getAbsolutePath());
@@ -106,11 +108,12 @@ public class Checker implements Runnable{
 			FileInputStream loadFile = new FileInputStream(datFile);
 			ObjectInputStream load = new ObjectInputStream(loadFile);
 			
-			queue = (List<Notify>) load.readObject();
+//			queue = (List<Notify>) load.readObject();
+			List<Notify> queue2 = (List<Notify>) load.readObject();
 			
 			load.close();
 			
-			log.info("Loading completed.");
+			log.info("Loading completed. " + queue2.toString());
 		}else{
 			log.info("No data founded.");
 		}
@@ -144,7 +147,7 @@ public class Checker implements Runnable{
 			
 			conn = openConnetion();
 			
-			while (true) {
+//			while (true) {
 
 				if (!queue.isEmpty()) {
 					List<Notify> scanList = new ArrayList<Notify>(queue);
@@ -188,13 +191,17 @@ public class Checker implements Runnable{
 				} else {
 					log.info("Empty List");
 				}
-				Thread.sleep(10000);
+//				Thread.sleep(10000);
+//			}
+			if (!queue.isEmpty()) {	
+				store();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			closeConnection();
 			return;
 		}
+		return;
 	}
 	
 	/**
