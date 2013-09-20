@@ -48,22 +48,16 @@ public class Checker implements Runnable{
 	 * @throws IOException
 	 */
 	public static void store() throws IOException{
-		log.info("Storing Checker queue ...");
-		
-		String contextPath = DiracConfig.class.getClassLoader()
-				.getResource("").getPath(); 
+		log.info("Storing Checker queue ...\n"+queue.toString()); 
 		
 		File datFile;
 		try {
-			datFile = new File(contextPath + "/content/" + DiracConfig.getProperties("Dirac.properties", "dirac.checker.store"));
+			datFile = new File(System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.checker.store"));
 		} catch (DiracException e) {
-//			datFile = new File(contextPath + "/content/checker.dat");
-			datFile = new File("/opt/test/checker.dat");
+			datFile = new File(System.getProperty("java.io.tmpdir") + "/diracAdmin/checker.dat");
 		}
 		
 		log.info("Backup file: " + datFile.getAbsolutePath());
-		
-//		File datFile = new File("/tmp/save.dat");
 		
 		if(datFile.exists())
 			datFile.delete();
@@ -88,32 +82,25 @@ public class Checker implements Runnable{
 	public static void load() throws IOException, ClassNotFoundException{
 		log.info("Loading Checker queue ...");
 		
-		String contextPath = DiracConfig.class.getClassLoader()
-				.getResource("").getPath(); 
-		
 		File datFile;
 		try {
-			datFile = new File(contextPath + "/content/" + DiracConfig.getProperties("Dirac.properties", "dirac.checker.store"));
+			datFile = new File(System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.checker.store"));
 		} catch (DiracException e) {
-//			datFile = new File(contextPath + "/content/checker.dat");
-			datFile = new File("/opt/test/checker.dat");
+			datFile = new File(System.getProperty("java.io.tmpdir") + "/diracAdmin/checker.dat");
 		}
 			
 		log.info("Backup file: " + datFile.getAbsolutePath());
-		
-//		File datFile = new File("/tmp/save.dat");
 		
 		if(datFile.exists()){
 		
 			FileInputStream loadFile = new FileInputStream(datFile);
 			ObjectInputStream load = new ObjectInputStream(loadFile);
 			
-//			queue = (List<Notify>) load.readObject();
-			List<Notify> queue2 = (List<Notify>) load.readObject();
+			queue = (List<Notify>) load.readObject();
 			
 			load.close();
 			
-			log.info("Loading completed. " + queue2.toString());
+			log.info("Loading completed. " + queue.toString());
 		}else{
 			log.info("No data founded.");
 		}
@@ -128,6 +115,11 @@ public class Checker implements Runnable{
 
 		if (queue.add(notify)) {
 			log.info("Task Successfully Added");
+			try {
+				store();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} else {
 			log.error("Task Not Added ");
 		}
@@ -142,59 +134,49 @@ public class Checker implements Runnable{
 		
 		try {
 			log.info("Starting Queue Scanner Process.");
-			
-			load();
-			
-			conn = openConnetion();
-			
-//			while (true) {
 
-				if (!queue.isEmpty()) {
-					List<Notify> scanList = new ArrayList<Notify>(queue);
-					for (Notify n : scanList) {
+			if (!queue.isEmpty()) {
+				boolean isChanged = false;
+				List<Notify> scanList = new ArrayList<Notify>(queue);
+				for (Notify n : scanList) {
+				
+					log.info("Checking: " + n);
 					
-						log.info("Checking: " + n);
+					boolean status = true;
+					List<String> jobsStatus = new ArrayList<String>();
+					for (long jobId : n.getJobs()) {
 						
-						boolean status = true;
-						List<String> jobsStatus = new ArrayList<String>();
-						for (long jobId : n.getJobs()) {
-							
-							String jobStatus = getStatus(jobId);
-							
-							if(!jobStatus.equals("Done") && !jobStatus.equals("Failed") && !jobStatus.equals("Deleted")){
-								status=false;
-								break;
-							}else{
-								jobsStatus.add(jobStatus);
-							}
+						String jobStatus = getStatus(jobId);
+						
+						if(!jobStatus.equals("Done") && !jobStatus.equals("Failed") && !jobStatus.equals("Deleted")){
+							status=false;
+							break;
+						}else{
+							jobsStatus.add(jobStatus);
 						}
-						
-						
-						
-						if(status){
-							
-							boolean isDeleted = true;
-							
-							for (String string : jobsStatus) {
-								if(!string.equals("Deleted"))
-									isDeleted = false;
-							}
-							
-							if(!isDeleted){
-								sendMail(n, jobsStatus);
-							}
-							queue.remove(n);
-						}
-					
 					}
 					
-				} else {
-					log.info("Empty List");
+					if(status){
+						
+						boolean isDeleted = true;
+						
+						for (String string : jobsStatus) {
+							if(!string.equals("Deleted"))
+								isDeleted = false;
+						}
+						
+						if(!isDeleted){
+							sendMail(n, jobsStatus);
+						}
+						queue.remove(n);
+						isChanged = true;
+					}
+				
 				}
-//				Thread.sleep(10000);
-//			}
-			if (!queue.isEmpty()) {	
-				store();
+				if(isChanged)
+					store();
+			} else {
+				log.info("Empty List");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -285,15 +267,13 @@ public class Checker implements Runnable{
 	 */
 	private String getStatus(long jobId) throws SQLException, DiracException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		
-		if(conn.isClosed())
+		if(conn==null||conn.isClosed())
 			conn = openConnetion();
 		
 		Statement statement = conn.createStatement();
 		
 	    String status = ""; 
 	    String query = "SELECT Status FROM Jobs WHERE JobID = \"" + jobId + "\"";
-	    
-//	    log.info("Quering JobDB: " + query);
 	    
 	    ResultSet resultSet = statement.executeQuery(query);
 	    

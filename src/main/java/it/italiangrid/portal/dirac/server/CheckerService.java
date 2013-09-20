@@ -27,12 +27,7 @@ public class CheckerService implements ServletContextListener {
 	/**
 	 * The executor for the thread management.
 	 */
-	private ScheduledExecutorService scheduler  = Executors.newSingleThreadScheduledExecutor();;
-	
-	/**
-	 * The scheduler for the thread backup.
-	 */
-	private ScheduledExecutorService schedulerBackup  = Executors.newSingleThreadScheduledExecutor();;
+	private ScheduledExecutorService scheduler  = Executors.newSingleThreadScheduledExecutor();
 
 	/**
 	 * Kill the Checker thread.
@@ -50,7 +45,6 @@ public class CheckerService implements ServletContextListener {
 		Checker.closeConnection();
 		
 		scheduler.shutdownNow();
-		schedulerBackup.shutdownNow();
 	}
 
 	/**
@@ -63,18 +57,12 @@ public class CheckerService implements ServletContextListener {
 		try {
 			Checker.load();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		scheduler.scheduleAtFixedRate(new Checker(), 0, 10, TimeUnit.SECONDS);
-		
-		log.info("Start the Checker Backup Service.");
-		
-		schedulerBackup.scheduleAtFixedRate(new CheckerBackup(), 0, 20, TimeUnit.SECONDS);
 		
 	}
 
