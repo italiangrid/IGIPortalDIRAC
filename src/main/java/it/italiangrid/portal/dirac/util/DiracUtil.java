@@ -12,8 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -33,6 +35,12 @@ public class DiracUtil {
 		
 		return myJdl;
 	}
+	
+	public static List<String> getTemplates(int userId){
+		List<String> result = new ArrayList<String>();
+		
+		return result;
+	} 
 
 	public static void delete(File file)
 	    	throws IOException{
