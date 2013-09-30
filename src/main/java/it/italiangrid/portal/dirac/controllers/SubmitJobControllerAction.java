@@ -18,6 +18,7 @@ import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.model.Jdl;
 import it.italiangrid.portal.dirac.model.Notify;
 import it.italiangrid.portal.dirac.server.Checker;
+import it.italiangrid.portal.dirac.util.DiracConfig;
 import it.italiangrid.portal.dirac.util.DiracUtil;
 import it.italiangrid.portal.dirac.util.GuseNotify;
 import it.italiangrid.portal.dirac.util.GuseNotifyUtil;
@@ -101,6 +102,8 @@ public class SubmitJobControllerAction {
 				
 		        File tempFile;
 		        
+		        boolean needsWrapper = false;
+		        
 		        @SuppressWarnings("unchecked")
 				Enumeration<String> paramEnum = uploadRequest.getParameterNames();
 		        while (paramEnum.hasMoreElements())
@@ -145,6 +148,8 @@ public class SubmitJobControllerAction {
 				                log.info(parameter +" = "+fileName);
 				                
 				                if(!fileName.isEmpty()){
+				                	
+				                	needsWrapper = true;
 				                	
 				                	log.info("Uploading exe file: " + fileName);
 				                
@@ -200,6 +205,21 @@ public class SubmitJobControllerAction {
 				}
 				jdl.setOutputSandbox(outputSandbox);
 		        
+				if(needsWrapper){
+					List<String> newIS = new ArrayList<String>();
+					newIS.add(jdl.getExecutable());
+					if(!inputSandbox.isEmpty()){
+			        	newIS.addAll(inputSandbox);
+			        }
+					inputSandbox = newIS;
+					
+					String wrapperPath = System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir") + "/dirac-wrapper.sh";
+					
+					File wrapperFile = new File(wrapperPath);
+					
+					jdl.setExecutable(wrapperFile.getAbsolutePath());
+				}
+				
 		        if(!inputSandbox.isEmpty()){
 		        	jdl.setInputSandbox(inputSandbox);
 		        }
