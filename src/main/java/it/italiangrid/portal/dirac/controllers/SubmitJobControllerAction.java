@@ -18,6 +18,7 @@ import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.model.Jdl;
 import it.italiangrid.portal.dirac.model.Notify;
 import it.italiangrid.portal.dirac.server.Checker;
+import it.italiangrid.portal.dirac.util.DiracConfig;
 import it.italiangrid.portal.dirac.util.DiracUtil;
 import it.italiangrid.portal.dirac.util.GuseNotify;
 import it.italiangrid.portal.dirac.util.GuseNotifyUtil;
@@ -60,6 +61,7 @@ public class SubmitJobControllerAction {
 				UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
 				
 				String path;
+				String diracWrapper = DiracConfig.getProperties("Dirac.properties", "dirac.wrapper.script");
 				
 				log.info(uploadRequest.getParameter("settedPath")!=null?uploadRequest.getParameter("settedPath"):"is null");
 				
@@ -100,6 +102,8 @@ public class SubmitJobControllerAction {
 				List<String> inputSandbox = new ArrayList<String>();
 				
 		        File tempFile;
+		        
+		        boolean needsWrapper = false;
 		        
 		        @SuppressWarnings("unchecked")
 				Enumeration<String> paramEnum = uploadRequest.getParameterNames();
@@ -146,6 +150,8 @@ public class SubmitJobControllerAction {
 				                
 				                if(!fileName.isEmpty()){
 				                	
+				                	needsWrapper = true;
+				                	
 				                	log.info("Uploading exe file: " + fileName);
 				                
 				                	tempFile = uploadRequest.getFile(parameter, true);
@@ -177,13 +183,12 @@ public class SubmitJobControllerAction {
 			            		}
 			            		if(parameter.contains("executable")){
 			            			
+							        if(!value.startsWith("/"))
+							        	needsWrapper=true;
 							        
 							        jdl.setParameter(parameter, value);
 			            		}
 			            	}else{
-					          
-				            	
-						        
 						        jdl.setParameter(parameter, value);
 			            	}
 		            	}
@@ -200,6 +205,31 @@ public class SubmitJobControllerAction {
 				}
 				jdl.setOutputSandbox(outputSandbox);
 		        
+				if(needsWrapper){
+					
+					String wrapperPath = System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir") + "/" + diracWrapper;
+					List<String> newIS = new ArrayList<String>();
+					newIS.add(wrapperPath);
+					if(!inputSandbox.isEmpty()){
+			        	newIS.addAll(inputSandbox);
+			        }
+					inputSandbox = newIS;
+					
+					
+					
+//					File wrapperFile = new File(wrapperPath);
+					
+					String destPath = path + "/" + diracWrapper;
+					
+					FileUtil.copyFile(wrapperPath, destPath);
+					
+					jdl.setExecutable(diracWrapper);
+					
+					String arguments = newIS.get(1).substring(newIS.get(1).lastIndexOf("/")+1, newIS.get(1).length()) + " " + jdl.getArguments();
+					
+					jdl.setArguments(arguments);
+				}
+				
 		        if(!inputSandbox.isEmpty()){
 		        	jdl.setInputSandbox(inputSandbox);
 		        }
