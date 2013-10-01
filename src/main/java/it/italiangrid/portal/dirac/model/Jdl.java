@@ -3,6 +3,7 @@ package it.italiangrid.portal.dirac.model;
 import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.db.domain.JobJdls;
 import it.italiangrid.portal.dirac.exception.DiracException;
+import it.italiangrid.portal.dirac.util.DiracConfig;
 
 import java.io.File;
 import java.nio.CharBuffer;
@@ -719,6 +720,7 @@ public class Jdl {
 		
 		String row = null;
 		String[] values;
+		boolean haveWrapper = false;
 		
 		for (String key : parameterJDLNames) {
 			
@@ -757,6 +759,11 @@ public class Jdl {
 						}
 						
 						break;
+					case 1: /* Executable */
+						value= value.replaceAll("\"", "");
+						if(value.equals(DiracConfig.getProperties("Dirac.properties", "dirac.wrapper.script"))){
+							haveWrapper = true;
+						}
 					default:
 						if(value.contains("{")&&value.contains("}")){
 							value= value.replaceAll("\"", "");
@@ -777,6 +784,22 @@ public class Jdl {
 		
 		row = grep(cb, "JobID");
 		String jobId = row.substring(row.indexOf("=")+2, row.length()-2);
+		
+		if(haveWrapper){
+			this.executable = this.inputSandbox.get(1).substring(this.inputSandbox.get(1).lastIndexOf("/")+1, this.inputSandbox.get(1).length());
+			String[] oldArguments = this.arguments.split(" ");
+			String newArguments = "";
+			for (int i = 1; i < oldArguments.length; i++) {
+				newArguments += oldArguments[i] + " ";
+			}
+			this.arguments = newArguments;
+			this.inputSandbox.remove(1);
+			this.inputSandbox.remove(0);
+			
+			if(this.inputSandbox.size()==0){
+				this.inputSandbox = null;
+			}
+		}
 		
 		getInputSandboxFile(userId, jobId);
 		

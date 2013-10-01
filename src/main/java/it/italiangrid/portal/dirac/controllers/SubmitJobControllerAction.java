@@ -61,6 +61,7 @@ public class SubmitJobControllerAction {
 				UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
 				
 				String path;
+				String diracWrapper = DiracConfig.getProperties("Dirac.properties", "dirac.wrapper.script");
 				
 				log.info(uploadRequest.getParameter("settedPath")!=null?uploadRequest.getParameter("settedPath"):"is null");
 				
@@ -182,13 +183,12 @@ public class SubmitJobControllerAction {
 			            		}
 			            		if(parameter.contains("executable")){
 			            			
+							        if(!value.startsWith("/"))
+							        	needsWrapper=true;
 							        
 							        jdl.setParameter(parameter, value);
 			            		}
 			            	}else{
-					          
-				            	
-						        
 						        jdl.setParameter(parameter, value);
 			            	}
 		            	}
@@ -206,18 +206,28 @@ public class SubmitJobControllerAction {
 				jdl.setOutputSandbox(outputSandbox);
 		        
 				if(needsWrapper){
+					
+					String wrapperPath = System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir") + "/" + diracWrapper;
 					List<String> newIS = new ArrayList<String>();
-					newIS.add(jdl.getExecutable());
+					newIS.add(wrapperPath);
 					if(!inputSandbox.isEmpty()){
 			        	newIS.addAll(inputSandbox);
 			        }
 					inputSandbox = newIS;
 					
-					String wrapperPath = System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir") + "/dirac-wrapper.sh";
 					
-					File wrapperFile = new File(wrapperPath);
 					
-					jdl.setExecutable(wrapperFile.getAbsolutePath());
+//					File wrapperFile = new File(wrapperPath);
+					
+					String destPath = path + "/" + diracWrapper;
+					
+					FileUtil.copyFile(wrapperPath, destPath);
+					
+					jdl.setExecutable(diracWrapper);
+					
+					String arguments = newIS.get(1).substring(newIS.get(1).lastIndexOf("/")+1, newIS.get(1).length()) + " " + jdl.getArguments();
+					
+					jdl.setArguments(arguments);
 				}
 				
 		        if(!inputSandbox.isEmpty()){
