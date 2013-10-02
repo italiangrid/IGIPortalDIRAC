@@ -23,6 +23,8 @@
 
 <%@ page import= "java.util.List" %>
 
+<%@ page import="javax.portlet.PortletURL" %>
+
 <portlet:defineObjects />	
 <liferay-theme:defineObjects />
 

@@ -5,9 +5,15 @@ import it.italiangrid.portal.dirac.db.domain.JobJdls;
 import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.util.DiracConfig;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.liferay.portal.kernel.util.FileUtil;
@@ -527,7 +534,7 @@ public class Jdl {
 		if (inputSandbox != null) {
 			string += "InputSandbox = {";
 			for (String s : inputSandbox) {
-				string += "\"" + s + "\", ";
+				string += "\"" + s + "\",";
 			}
 
 			string = string.substring(0, string.length() - 2);
@@ -537,7 +544,7 @@ public class Jdl {
 		if (outputSandbox != null) {
 			string += "OutputSandbox = {";
 			for (String s : outputSandbox) {
-				string += "\"" + s + "\", ";
+				string += "\"" + s + "\",";
 			}
 
 			string = string.substring(0, string.length() - 2);
@@ -557,7 +564,7 @@ public class Jdl {
 		if (inputData != null) {
 			string += "InputData = {";
 			for (String s : inputData) {
-				string += "\"" + s + "\", ";
+				string += "\"" + s + "\",";
 			}
 
 			string = string.substring(0, string.length() - 2);
@@ -572,16 +579,16 @@ public class Jdl {
 			for (List<String> list : outputData) {
 				string += "[";
 				if (!list.get(0).equals("noData")) {
-					string += "OutputFile = " + list.get(0) + "; ";
+					string += "OutputFile = " + list.get(0) + ";";
 				}
 				if (!list.get(1).equals("noData")) {
-					string += "StorageElement = " + list.get(1) + "; ";
+					string += "StorageElement = " + list.get(1) + ";";
 				}
 				if (!list.get(2).equals("noData")) {
-					string += "LogicalFileName = " + list.get(2) + "; ";
+					string += "LogicalFileName = " + list.get(2) + ";";
 				}
 				string = string.substring(0, string.length() - 2);
-				string += "], ";
+				string += "],";
 			}
 
 			string = string.substring(0, string.length() - 2);
@@ -601,7 +608,7 @@ public class Jdl {
 				if(!parameters.isEmpty()){
 					string += "Parameters = {";
 					for (String s : parameters.split(";")) {
-						string += "\"" + s + "\", ";
+						string += "\"" + s + "\",";
 					}
 	
 					string = string.substring(0, string.length() - 2);
@@ -632,7 +639,7 @@ public class Jdl {
 		if (site != null && !site.isEmpty() && !site.equals("ANY")) {
 			string += "Site = \"" + site + "\";\n";
 		}
-
+		string+="\n";
 		return string;
 	}
 
@@ -668,12 +675,15 @@ public class Jdl {
 		}
 	}
 	public void copyJob(JobJdls diracJdl, long userId) throws DiracException, IOException {
-		copyJob(diracJdl, userId, false, null);
+		String diracJdlString = new String(diracJdl.getJdl());
+		copyJob(diracJdlString, userId, false, null);
 	}
 
-	public void copyJob(JobJdls diracJdl, long userId, boolean isTemplate, String templatePath) throws DiracException, IOException {
+	public void copyJob(String diracJdlString, long userId, boolean isTemplate, String templatePath) throws DiracException, IOException {
 	
-		String diracJdlString = new String(diracJdl.getJdl());
+		if(isTemplate){
+			diracJdlString = loadFromFile(templatePath);
+		}
 		
 		log.info(diracJdlString);
 		
@@ -831,6 +841,44 @@ public class Jdl {
 		
 	}
 	
+	private String loadFromFile(String path) throws FileNotFoundException, IOException {
+		File templatePath = new File(path);
+		
+		List<File> listDir = new ArrayList<File>(Arrays.asList(templatePath.listFiles()));
+		
+		File jdlFile = null;
+		
+		for (File file : listDir) {
+			log.info("File: " + file.toString());
+			log.info("Extension: "+ file.toString().substring(file.toString().lastIndexOf(".")+1, file.toString().length()));
+			
+			String extension = file.toString().substring(file.toString().lastIndexOf(".")+1, file.toString().length());
+			log.info("Check: " + extension.equals("jdl"));
+			
+			if(extension.equals("jdl")){
+				log.info("Founded: " + file.toString());
+				jdlFile = file;
+				break;
+			}
+		}
+		
+		BufferedReader br = new BufferedReader(new FileReader(jdlFile));
+	    try {
+	        StringBuilder sb = new StringBuilder();
+	        String line = br.readLine();
+
+	        while (line != null) {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = br.readLine();
+	        }
+	        return sb.toString();
+	    } finally {
+	        br.close();
+	    }
+		
+	}
+
 	private void getInputTemplate(long userId, String templatePath) throws IOException {
 		/*
 		 * Create folder, and save path into field

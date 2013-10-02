@@ -36,11 +36,11 @@ public class DiracUtil {
 		return myJdl;
 	}
 	
-	public static Jdl getTemplate(JobJdls diracJdl, long userId) throws DiracException, IOException{
+	public static Jdl getTemplate(long userId, String path) throws DiracException, IOException{
 		
 		Jdl myJdl = new Jdl();
 		
-		myJdl.copyJob(diracJdl, userId);
+		myJdl.copyJob(null, userId, true, path);
 		
 		myJdl.setJobName("Portal_Job_Copy_of_Template_" + myJdl.getJobName());
 		

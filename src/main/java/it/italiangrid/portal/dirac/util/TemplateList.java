@@ -6,6 +6,7 @@ import it.italiangrid.portal.dirac.model.Template;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class TemplateList {
@@ -75,6 +76,8 @@ public class TemplateList {
 		
 		scanFolder(userPath, "Private");
 		scanFolder(sharedPath, "Shared");
+		
+		Collections.sort(this.templates);
 		
 	}
 

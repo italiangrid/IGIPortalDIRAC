@@ -1,4 +1,7 @@
 <%@ include file="/WEB-INF/jsp/init.jsp"%>
+
+<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+
 <script type="text/javascript">
 	var count = 0;
 	function deleteFile(divName){
@@ -46,7 +49,7 @@
 		}
 	}
 	
-	function change(input, share, saveOnly){
+	function changeCheckbox(input, share, saveOnly){
 		if(input.attr('checked')=='checked'){
 			$("#"+share).removeAttr("disabled");
 			$("#"+saveOnly).removeAttr("disabled");
@@ -58,11 +61,82 @@
 		}
 	}
 	
+	function changeTemplate(){
+		if ($('.templates').css('display') == 'none') {
+			$('.templates').show('slow');
+			$('.jdlDiv').hide('slow');
+		}else{
+			$('.templates').hide('slow');
+			$('.jdlDiv').show('slow');
+		}
+	}
+	
 	$(document).ready(function() {
 		appendExecutable();
+		$('#template_table').dataTable();
 		//appendInputSandbox();
 		});
 </script>
+
+<style type="text/css">
+
+.templates{
+	display: none; 
+}
+
+.tempaltesCss{
+	margin: 10px;
+}
+
+#template_table_wrapper{
+	width: 100%;
+}
+
+.sorting_disabled{
+	display: none;
+}
+
+#template_table{
+	background-color: white;
+}
+
+#template_table_length{
+	float: left;
+	margin-left: 5px;
+}
+
+#template_table_filter{
+	float: right;
+	margin-right: 5px;
+}
+
+#template_table_info{
+	float: left;
+	margin-left: 5px;
+}
+
+#template_table_paginate{
+	float: right;
+	margin-right: 5px;
+}
+
+#template_table_paginate a{
+	padding-left: 5px;
+}
+	
+.even {
+	background-color: #F5F8FB;
+}
+
+.effect:hover td{
+	background:  #D3E8F1;
+	border: 1px solid #D3E8F1;
+	border-bottom-color: #D7D7D7;
+}
+.jdlDiv{
+	display: none;
+}
+</style>
 
 <div id="containerDirac">
 	<div id="presentationDirac">My Jobs</div>
@@ -76,6 +150,10 @@
 		<portlet:actionURL var="submitUrl">
 			<portlet:param name="myaction" value="submitJob" />
 		</portlet:actionURL>
+		<portlet:actionURL var="goHome">
+			<portlet:param name="myaction" value="goHome"></portlet:param>
+			<portlet:param name="settedPath" value="${jdl.path }"></portlet:param>
+		</portlet:actionURL>
 		
 		<jsp:useBean id="vos"
 				type="java.util.List<it.italiangrid.portal.dbapi.domain.Vo>"
@@ -84,50 +162,67 @@
 				type="java.util.List<it.italiangrid.portal.dirac.model.Template>"
 				scope="request" />	
 		
-		<div id=templates>
+		<c:if test="${jdl.path == '' }">
+			<div class="jdlDiv">
+				<aui:button type="button" value="View Template" onClick="changeTemplate();"/>
+			</div>
+			<div class="templates">
+				<aui:button type="button" value="View JDL" onClick="changeTemplate();"/>
+			</div>
+		</c:if>
 		
-		<liferay-ui:search-container
-		emptyResultsMessage="No Templates" delta="5" curParam="curTemplate" deltaParam="deltaTemplate">
-			<liferay-ui:search-container-results total="<%= templateList.size() %>" results="<%=ListUtil.subList(templateList, searchContainer.getStart(), searchContainer.getEnd()) %>" />
-			<liferay-ui:search-container-row 
-				className="it.italiangrid.portal.dirac.model.Template"
-				keyProperty="name" modelVar="template">
-				
-				
-				<liferay-ui:search-container-column-text name="Name"
-					property="name" />
-				<liferay-ui:search-container-column-text name="Type"
-					property="type" />
-				<liferay-ui:search-container-column-text name="Owner"
-					property="owner" />	
-					
-				<liferay-ui:search-container-column-text name="Actions">
-				
-					<liferay-ui:icon-menu>
-						
-						<portlet:actionURL var="useTemplateURL">
-							<portlet:param name="myaction" value="useTemplate"/>
-							<portlet:param name="path" value="${template.path }"/>
-						</portlet:actionURL>
-						<liferay-ui:icon image="configuration" message="Use" url="${useTemplateURL}" />
-						
-						<c:if test="${template.owner == user.userId}">
-							<portlet:actionURL  var="deleteTemplateURL">
-								<portlet:param name="myaction" value="deleteTemplate"/>
-								<portlet:param name="path" value="${template.path }"/>
-							</portlet:actionURL>
-							<liferay-ui:icon-delete url="${deleteTemplateURL}" />
-						</c:if>
-					
-					</liferay-ui:icon-menu>
-				</liferay-ui:search-container-column-text>
-				
-			</liferay-ui:search-container-row>
-			<liferay-ui:search-iterator />
-		</liferay-ui:search-container>	
 		
+		<div class="templates tempaltesCss">
+		
+			<table id="template_table" class="taglib-search-iterator">
+			
+				<thead>
+					<tr  class="portlet-section-header results-header">
+						<th class="col-1 first sorting">Name</th>
+						<th class="col-2 sorting">Type</th>
+						<th class="col-3 sorting">Owner</th>
+						<th class="col-4 last sorting">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="template" items="${templateList }" > 
+						<tr class="results-row portlet-section-alternate-hover effect">
+							<td>${template.name }</td>
+							<td>${template.type }</td>
+							<td>${template.owner }</td>
+							<td>
+								<liferay-ui:icon-menu>
+							
+									<portlet:renderURL var="useTemplateURL">
+										<portlet:param name="myaction" value="showSubmitJob"/>
+										<portlet:param name="path" value="${template.path }"/>
+									</portlet:renderURL>
+									<liferay-ui:icon image="configuration" message="Use" url="${useTemplateURL}" />
+									
+									<c:if test="${template.owner == user.userId}">
+										<portlet:actionURL  var="deleteTemplateURL">
+											<portlet:param name="myaction" value="deleteTemplate"/>
+											<portlet:param name="path" value="${template.path }"/>
+										</portlet:actionURL>
+										<liferay-ui:icon-delete url="${deleteTemplateURL}" />
+									</c:if>
+								
+								</liferay-ui:icon-menu>
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			
+			</table>
+			
+			
+			<aui:form name="back" action="${goHome }">
+			<aui:button-row>
+			<aui:button type="submit" value="Back"/>
+			</aui:button-row>
+			</aui:form>
 		</div>	
-		
+		<div class="jdlDiv">
 		<aui:form name="newJdl" action="${submitUrl }" commandName="jdl" enctype="multipart/form-data">
 			<div id="myJdl">
 				<aui:fieldset label="JDL">
@@ -410,18 +505,15 @@
 				</aui:fieldset>	
 			</div>
 			<div id="reset"></div>
-			<aui:input name="saveAsTemplate" type="checkbox" label="Save As Template" onClick="change($(this), 'shareTemplate', 'saveOnly');"/>
+			<aui:input name="saveAsTemplate" type="checkbox" label="Save As Template" onClick="changeCheckbox($(this), 'shareTemplate', 'saveOnly');"/>
 			<input id="saveOnly" name="saveOnly" type="checkbox"  disabled="disabled"/> <Strong>Save Only</Strong><br/>
 			<input id="shareTemplate" name="shareTemplate" type="checkbox"  disabled="disabled"/> <Strong>Share Template</Strong>
 			<aui:button-row>
 			<aui:button type="submit" value="Submit"/>
-			<portlet:actionURL var="goHome">
-				<portlet:param name="myaction" value="goHome"></portlet:param>
-				<portlet:param name="settedPath" value="${jdl.path }"></portlet:param>
-			</portlet:actionURL>
 			<aui:button type="button" value="Back" onClick="${goHome }"/>
 			</aui:button-row>
 		</aui:form>
+		</div>
 	</div>
 </div>
 
@@ -483,6 +575,12 @@
 		$("#outputSandboxDiv").show();
 		$('#outremove').show(); 
 		$('#outadd').hide();
+	}
+	
+	if("${viewTemplate}"=='true'){
+		$('.templates').show();
+	}else{
+		$('.jdlDiv').show();
 	}
 	
 </script>

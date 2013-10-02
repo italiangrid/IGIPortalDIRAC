@@ -14,11 +14,11 @@ import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 
-@Controller("templateController")
+@Controller("templateActionController")
 @RequestMapping(value = "VIEW")
-public class TemplateController {
+public class TemplateActionController {
 	
-	private static final Logger log = Logger.getLogger(TemplateController.class);
+	private static final Logger log = Logger.getLogger(TemplateActionController.class);
 
 	@ActionMapping(params = "myaction=deleteTemplate")
 	public void deleteTemplate(ActionRequest request, ActionResponse response){
@@ -37,29 +37,13 @@ public class TemplateController {
 				
 				log.info("Template deleted");
 			}
+			
+			response.setRenderParameter("myaction", "showSubmitJob");
+			response.setRenderParameter("viewTemplate", "true");
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	@ActionMapping(params = "myaction=useTemplate")
-	public void useTemplate(ActionRequest request, ActionResponse response){
-		String path = request.getParameter("path");
-		log.info("Use: " + path);
-		try {
-			User user = PortalUtil.getUser(request);
-
-			if (user != null) {
-				
-//				String diracJdl = "";
-				
-//				DiracUtil.getTemplate(diracJdl, user.getUserId());
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 	}
 }

@@ -1,6 +1,6 @@
 package it.italiangrid.portal.dirac.model;
 
-public class Template {
+public class Template implements Comparable<Template> {
 
 	
 	private String name;
@@ -134,6 +134,12 @@ public class Template {
 			return false;
 		return true;
 	}
+
+	public int compareTo(Template o) {
+		// TODO Auto-generated method stub
+		return this.name.compareTo(o.getName());
+	}
+	
 	
 	
 	
