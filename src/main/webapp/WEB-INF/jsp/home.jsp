@@ -105,7 +105,8 @@
 				scope="request" />
 		<portlet:actionURL var="deleteMultipleJob">
 			<portlet:param name="myaction" value="deleteMultipleJob"/>
-		</portlet:actionURL>		
+		</portlet:actionURL>	
+		
 		<form name="delMultForm" action="${deleteMultipleJob}" method="POST">
 			
 			<div class="deleteButton" style="display: none;">

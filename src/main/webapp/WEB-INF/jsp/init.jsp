@@ -12,6 +12,7 @@
 
 <%@ page import="it.italiangrid.portal.dbapi.domain.*" %>
 <%@ page import="it.italiangrid.portal.dirac.db.domain.*" %>
+<%@ page import="it.italiangrid.portal.dirac.model.*" %>
 
 
 <%@ page import="com.liferay.portal.kernel.util.ListUtil" %> 

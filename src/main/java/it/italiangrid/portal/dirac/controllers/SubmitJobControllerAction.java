@@ -62,6 +62,8 @@ public class SubmitJobControllerAction {
 				
 				String path;
 				String diracWrapper = DiracConfig.getProperties("Dirac.properties", "dirac.wrapper.script");
+				String diracHome = DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir");
+				String templateHome = DiracConfig.getProperties("Dirac.properties", "dirac.template.home");
 				
 				log.info(uploadRequest.getParameter("settedPath")!=null?uploadRequest.getParameter("settedPath"):"is null");
 				
@@ -207,7 +209,7 @@ public class SubmitJobControllerAction {
 		        
 				if(needsWrapper){
 					
-					String wrapperPath = System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir") + "/" + diracWrapper;
+					String wrapperPath = System.getProperty("java.io.tmpdir") + "/" + diracHome + "/" + diracWrapper;
 					List<String> newIS = new ArrayList<String>();
 					newIS.add(wrapperPath);
 					if(!inputSandbox.isEmpty()){
@@ -257,18 +259,52 @@ public class SubmitJobControllerAction {
 				 * Submit job
 				 */
 				
-				List<Long> ids = util.submitJob(path, path, jdlFilename);
+				String saveOnly = uploadRequest.getParameter("saveOnly");
+				if(saveOnly==null){
+					
+					List<Long> ids = util.submitJob(path, path, jdlFilename);
+					
+					/*
+					 * Adding notify task
+					 */
+					boolean isNotify = isNotificationSetted(user);
+					
+					log.info("notify = " + isNotify);
+					if(isNotify){
+						Notify notify = new Notify(user.getEmailAddress(), user.getFirstName(), ids);
+						Checker.addNotify(notify);
+					}
+				}
 				
 				/*
-				 * Adding notify task
+				 * Manage Template
 				 */
-				boolean isNotify = isNotificationSetted(user);
+				boolean saveAsTemplate = Boolean.parseBoolean(uploadRequest.getParameter("saveAsTemplate"));
+				String shareTemplate = uploadRequest.getParameter("shareTemplate");
 				
-				log.info("notify = " + isNotify);
-				if(isNotify){
-					Notify notify = new Notify(user.getEmailAddress(), user.getFirstName(), ids);
-					Checker.addNotify(notify);
+				log.info("saveAsTempalte: " + saveAsTemplate);				
+				log.info("shareTemplate: " + shareTemplate);
+				
+				if(saveAsTemplate){
+					String copyPath;
+					if(shareTemplate==null){
+						/*
+						 * user template
+						 */
+						copyPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId()+"/DIRAC/"+ templateHome + "/" + jdl.getJobName().replaceAll(" ", "_")+"@"+user.getUserId();
+						copyPath = checkIfExsist(copyPath);
+						
+					} else {
+						/*
+						 * shared template
+						 */
+						copyPath = System.getProperty("java.io.tmpdir") + "/"+diracHome+"/"+ templateHome + "/" + jdl.getJobName().replaceAll(" ", "_")+"@"+user.getUserId();
+						copyPath = checkIfExsist(copyPath);
+					}
+					File destination = new File(copyPath);
+					FileUtil.copyDirectory(jdlFolder, destination);
 				}
+				
 				
 				/*
 				 * Delete temp folder
@@ -311,6 +347,30 @@ public class SubmitJobControllerAction {
 		response.setRenderParameter("myaction", "showSubmitJob");
 		request.setAttribute("jdl", jdl);
 		
+	}
+
+	private String checkIfExsist(String copyPath) {
+		File path = new File(copyPath);
+		if(path.exists()){
+			String owner = copyPath.split("@")[1];
+			String oldPath = copyPath.split("@")[0];
+			String last = oldPath.substring(oldPath.lastIndexOf("_")+1,oldPath.length());
+			if(!last.contains(".")&&!last.contains(",")){
+				try{
+					int index = Integer.parseInt(last);
+					String prefix = oldPath.substring(0,oldPath.lastIndexOf("_")+1);
+					index++;
+					oldPath=prefix+index;
+				} catch (NumberFormatException e){
+					oldPath += "_1"; 
+				}
+			}else{
+				oldPath += "_1";
+			}
+			copyPath = checkIfExsist(oldPath + "@" + owner);
+		}
+			
+		return copyPath;
 	}
 
 	private boolean isNotificationSetted(User user) {

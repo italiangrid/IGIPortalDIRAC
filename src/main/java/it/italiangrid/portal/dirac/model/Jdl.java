@@ -6,6 +6,7 @@ import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.util.DiracConfig;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.CharBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.log4j.Logger;
+
+import com.liferay.portal.kernel.util.FileUtil;
 
 public class Jdl {
 	
@@ -664,8 +667,11 @@ public class Jdl {
 		case 24: this.site = (String) value; break;
 		}
 	}
+	public void copyJob(JobJdls diracJdl, long userId) throws DiracException, IOException {
+		copyJob(diracJdl, userId, false, null);
+	}
 
-	public void copyJob(JobJdls diracJdl, long userId) throws DiracException {
+	public void copyJob(JobJdls diracJdl, long userId, boolean isTemplate, String templatePath) throws DiracException, IOException {
 	
 		String diracJdlString = new String(diracJdl.getJdl());
 		
@@ -782,8 +788,7 @@ public class Jdl {
 			}
 		}
 		
-		row = grep(cb, "JobID");
-		String jobId = row.substring(row.indexOf("=")+2, row.length()-2);
+		
 		
 		if(haveWrapper){
 			this.executable = this.inputSandbox.get(1).substring(this.inputSandbox.get(1).lastIndexOf("/")+1, this.inputSandbox.get(1).length());
@@ -801,7 +806,13 @@ public class Jdl {
 			}
 		}
 		
-		getInputSandboxFile(userId, jobId);
+		if(isTemplate){
+			getInputTemplate(userId, templatePath);
+		}else{
+			row = grep(cb, "JobID");
+			String jobId = row.substring(row.indexOf("=")+2, row.length()-2);
+			getInputSandboxFile(userId, jobId);
+		}
 		
 		this.outputSandboxRequest = "";
 		for(int i = 0; i < this.outputSandbox.size(); i++){
@@ -820,6 +831,33 @@ public class Jdl {
 		
 	}
 	
+	private void getInputTemplate(long userId, String templatePath) throws IOException {
+		/*
+		 * Create folder, and save path into field
+		 */
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+		Calendar cal = new GregorianCalendar();
+		Date now = cal.getTime();
+		
+		
+		String tmpDir = "JDL_"+sdf.format(now);
+		String userPath = System.getProperty("java.io.tmpdir") + "/users/"+userId;
+		String path = userPath + "/DIRAC/jdls/"+tmpDir;
+		
+		File jdlFolder = new File(path);
+		jdlFolder.mkdirs();
+		
+		this.path = path;
+		
+		/*
+		 * Move file into created folder
+		 */
+		
+		File originFolder = new File(templatePath);
+		FileUtil.copyDirectory(originFolder, jdlFolder);
+		
+	}
+
 	private void getInputSandboxFile(long userId, String jobId) throws DiracException {
 		/*
 		 * Create folder, and save path into field

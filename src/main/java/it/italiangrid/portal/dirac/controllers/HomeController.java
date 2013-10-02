@@ -14,8 +14,6 @@ import it.italiangrid.portal.dirac.db.service.JobsService;
 import it.italiangrid.portal.dirac.db.service.ProxiesService;
 import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.util.DiracConfig;
-import it.italiangrid.portal.dirac.util.TemplateList;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -168,21 +166,6 @@ public class HomeController {
 			e.printStackTrace();
 		}
 		return "https://portal.italiangrid.it/job";
-	}
-	
-	@ModelAttribute("templateList")
-	public TemplateList getTemplates(RenderRequest request){
-		try {
-			User user = PortalUtil.getUser(request);
-
-			if (user != null) {
-				
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new TemplateList();	
 	}
 	
 }

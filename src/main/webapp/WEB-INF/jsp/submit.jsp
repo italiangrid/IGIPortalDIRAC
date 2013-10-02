@@ -46,6 +46,18 @@
 		}
 	}
 	
+	function change(input, share, saveOnly){
+		if(input.attr('checked')=='checked'){
+			$("#"+share).removeAttr("disabled");
+			$("#"+saveOnly).removeAttr("disabled");
+		}else{
+			$("#"+share).attr("disabled", true);
+			$("#"+share).removeAttr("checked");
+			$("#"+saveOnly).attr("disabled", true);
+			$("#"+saveOnly).removeAttr("checked");
+		}
+	}
+	
 	$(document).ready(function() {
 		appendExecutable();
 		//appendInputSandbox();
@@ -67,7 +79,54 @@
 		
 		<jsp:useBean id="vos"
 				type="java.util.List<it.italiangrid.portal.dbapi.domain.Vo>"
-				scope="request" />		
+				scope="request" />
+		<jsp:useBean id="templateList"
+				type="java.util.List<it.italiangrid.portal.dirac.model.Template>"
+				scope="request" />	
+		
+		<div id=templates>
+		
+		<liferay-ui:search-container
+		emptyResultsMessage="No Templates" delta="5" curParam="curTemplate" deltaParam="deltaTemplate">
+			<liferay-ui:search-container-results total="<%= templateList.size() %>" results="<%=ListUtil.subList(templateList, searchContainer.getStart(), searchContainer.getEnd()) %>" />
+			<liferay-ui:search-container-row 
+				className="it.italiangrid.portal.dirac.model.Template"
+				keyProperty="name" modelVar="template">
+				
+				
+				<liferay-ui:search-container-column-text name="Name"
+					property="name" />
+				<liferay-ui:search-container-column-text name="Type"
+					property="type" />
+				<liferay-ui:search-container-column-text name="Owner"
+					property="owner" />	
+					
+				<liferay-ui:search-container-column-text name="Actions">
+				
+					<liferay-ui:icon-menu>
+						
+						<portlet:actionURL var="useTemplateURL">
+							<portlet:param name="myaction" value="useTemplate"/>
+							<portlet:param name="path" value="${template.path }"/>
+						</portlet:actionURL>
+						<liferay-ui:icon image="configuration" message="Use" url="${useTemplateURL}" />
+						
+						<c:if test="${template.owner == user.userId}">
+							<portlet:actionURL  var="deleteTemplateURL">
+								<portlet:param name="myaction" value="deleteTemplate"/>
+								<portlet:param name="path" value="${template.path }"/>
+							</portlet:actionURL>
+							<liferay-ui:icon-delete url="${deleteTemplateURL}" />
+						</c:if>
+					
+					</liferay-ui:icon-menu>
+				</liferay-ui:search-container-column-text>
+				
+			</liferay-ui:search-container-row>
+			<liferay-ui:search-iterator />
+		</liferay-ui:search-container>	
+		
+		</div>	
 		
 		<aui:form name="newJdl" action="${submitUrl }" commandName="jdl" enctype="multipart/form-data">
 			<div id="myJdl">
@@ -351,6 +410,9 @@
 				</aui:fieldset>	
 			</div>
 			<div id="reset"></div>
+			<aui:input name="saveAsTemplate" type="checkbox" label="Save As Template" onClick="change($(this), 'shareTemplate', 'saveOnly');"/>
+			<input id="saveOnly" name="saveOnly" type="checkbox"  disabled="disabled"/> <Strong>Save Only</Strong><br/>
+			<input id="shareTemplate" name="shareTemplate" type="checkbox"  disabled="disabled"/> <Strong>Share Template</Strong>
 			<aui:button-row>
 			<aui:button type="submit" value="Submit"/>
 			<portlet:actionURL var="goHome">

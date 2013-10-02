@@ -25,13 +25,24 @@ public class DiracUtil {
 	
 	private static final Logger log = Logger.getLogger(DiracUtil.class);
 	
-	public static Jdl parseJdl(JobJdls diracJdl, long userId) throws DiracException{
+	public static Jdl parseJdl(JobJdls diracJdl, long userId) throws DiracException, IOException{
 		
 		Jdl myJdl = new Jdl();
 		
 		myJdl.copyJob(diracJdl, userId);
 		
 		myJdl.setJobName("Portal_Job_Copy_of_" + diracJdl.getJobId());
+		
+		return myJdl;
+	}
+	
+	public static Jdl getTemplate(JobJdls diracJdl, long userId) throws DiracException, IOException{
+		
+		Jdl myJdl = new Jdl();
+		
+		myJdl.copyJob(diracJdl, userId);
+		
+		myJdl.setJobName("Portal_Job_Copy_of_Template_" + myJdl.getJobName());
 		
 		return myJdl;
 	}
