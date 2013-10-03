@@ -9,7 +9,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 public class TemplateList {
+	
+	private static final Logger log = Logger.getLogger(TemplateList.class);
 
 	private long user;
 	private List<Template> templates;
@@ -58,24 +62,9 @@ public class TemplateList {
 	}
 	
 	public void load(){
-	
-		String diracHome;
-		String templateHome;
-		String tomcatTemp = System.getProperty("java.io.tmpdir");
-		try {
-			diracHome = DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir");
-			templateHome = DiracConfig.getProperties("Dirac.properties", "dirac.template.home");
-		} catch (DiracException e) {
-			diracHome = "diracHome";
-			templateHome = "Template";
-			e.printStackTrace();
-		}
 		
-		String userPath = tomcatTemp + "/users/" + this.user + "/DIRAC/" + templateHome;
-		String sharedPath = tomcatTemp + "/" + diracHome + "/" + templateHome;
-		
-		scanFolder(userPath, "Private");
-		scanFolder(sharedPath, "Shared");
+		scanFolder(getPath(true), "Private");
+		scanFolder(getPath(false), "Shared");
 		
 		Collections.sort(this.templates);
 		
@@ -103,7 +92,57 @@ public class TemplateList {
 	public String toString() {
 		return "TemplateList [user=" + user + ", templates=" + templates + "]";
 	}
+
+	public void share(String path) {
+		
+		String sharePath = getPath(false) + path.substring(path.lastIndexOf("/"), path.length());
+		
+		if(path.equals(sharePath)){
+			log.info("Template " + path + " already shared");
+			return;
+		}
+		
+		sharePath = DiracUtil.checkIfExsist(sharePath);
+		log.info("SHARING\nMove template:\nFrom: " + path + "\nTo: " + sharePath);
+		
+		DiracUtil.mv(new File(path), sharePath);
+		
+	}
+
+	public void unshare(String path) {
+		
+		String localPath = getPath(true) + path.substring(path.lastIndexOf("/"), path.length());
+		
+		if(path.equals(localPath)){
+			log.info("Template " + path + " already private.");
+			return;
+		}
+		
+		localPath = DiracUtil.checkIfExsist(localPath);
+		
+		log.info("UNSHARING\nMove template:\nFrom: " + path + "\nTo: " + localPath);
+		DiracUtil.mv(new File(path), localPath);
+	}
 	
-	
+	private String getPath(boolean isPrivate){
+		String diracHome;
+		String templateHome;
+		String tomcatTemp = System.getProperty("java.io.tmpdir");
+		try {
+			diracHome = DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir");
+			templateHome = DiracConfig.getProperties("Dirac.properties", "dirac.template.home");
+		} catch (DiracException e) {
+			diracHome = "diracHome";
+			templateHome = "Template";
+			e.printStackTrace();
+		}
+		
+		String userPath = tomcatTemp + "/users/" + this.user + "/DIRAC/" + templateHome;
+		String sharedPath = tomcatTemp + "/" + diracHome + "/" + templateHome;
+		
+		if(isPrivate)
+			return userPath;
+		return sharedPath;
+	}
 	
 }

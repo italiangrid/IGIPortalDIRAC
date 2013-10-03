@@ -51,7 +51,7 @@ public class DiracUtil {
 		List<String> result = new ArrayList<String>();
 		
 		return result;
-	} 
+	}
 
 	public static void delete(File file)
 	    	throws IOException{
@@ -150,6 +150,50 @@ public class DiracUtil {
 		} finally {
 			out.close();
 		}
+	}
+
+	public static String checkIfExsist(String copyPath) {
+		File path = new File(copyPath);
+		if(path.exists()){
+			String owner = copyPath.split("@")[1];
+			String oldPath = copyPath.split("@")[0];
+			String last = oldPath.substring(oldPath.lastIndexOf("_")+1,oldPath.length());
+			if(!last.contains(".")&&!last.contains(",")){
+				try{
+					int index = Integer.parseInt(last);
+					String prefix = oldPath.substring(0,oldPath.lastIndexOf("_")+1);
+					index++;
+					oldPath=prefix+index;
+				} catch (NumberFormatException e){
+					oldPath += "_1"; 
+				}
+			}else{
+				oldPath += "_1";
+			}
+			copyPath = checkIfExsist(oldPath + "@" + owner);
+		}
+			
+		return copyPath;
+	}
+
+	public static void mv(File source, String destination) {
+		
+		File destFolder = new File(destination);
+		
+		destFolder.mkdir();
+		
+		if(source.isDirectory()) {
+		    File[] content = source.listFiles();
+		    for(int i = 0; i < content.length; i++) {
+		        content[i].renameTo(new File(destination+"/"+content[i].getName()));
+		        log.info("File " + content[i].getName() + "moved:\nFrom: " + source.getAbsolutePath() + "\nTo:   " + destination+"/"+content[i].getName());
+		    }
+		}
+		
+		source.delete();
+		
+		
+		
 	}
 	
 }

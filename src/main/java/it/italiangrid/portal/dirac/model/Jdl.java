@@ -4,16 +4,14 @@ import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.db.domain.JobJdls;
 import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.util.DiracConfig;
+import it.italiangrid.portal.dirac.util.DiracUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import com.liferay.portal.kernel.util.FileUtil;
@@ -936,19 +933,10 @@ public class Jdl {
 		 */
 		
 		File originFolder = new File(path+"/InputSandbox"+jobId);
-		if(originFolder.isDirectory()) {
-		    File[] content = originFolder.listFiles();
-		    for(int i = 0; i < content.length; i++) {
-		        content[i].renameTo(new File(path+"/"+content[i].getName()));
-		        log.info("File " + content[i].getName() + "moved:\nFrom: " + originFolder.getAbsolutePath() + "\nTo:   " + path+"/"+content[i].getName());
-		    }
-		}
 		
-		/*
-		 * Remove old folder
-		 */
+		DiracUtil.mv(originFolder, path);
 		
-		originFolder.delete();
+		
 	}
 
 	// Pattern used to parse lines
@@ -979,9 +967,6 @@ public class Jdl {
 		    if (lm.end() == cb.limit())
 		    	break;
 		}
-		
-		
-		
 		
 		return null;
 	}

@@ -53,11 +53,15 @@
 		if(input.attr('checked')=='checked'){
 			$("#"+share).removeAttr("disabled");
 			$("#"+saveOnly).removeAttr("disabled");
+			$('#submitButton').attr('value','Save & Submit');
+			$('#checks').show('slow');
 		}else{
 			$("#"+share).attr("disabled", true);
 			$("#"+share).removeAttr("checked");
 			$("#"+saveOnly).attr("disabled", true);
 			$("#"+saveOnly).removeAttr("checked");
+			$('#submitButton').attr('value','Submit');
+			$('#checks').hide('slow');
 		}
 	}
 	
@@ -69,6 +73,56 @@
 			$('.templates').hide('slow');
 			$('.jdlDiv').show('slow');
 		}
+	}
+	
+	function changeSubmitButton(el){
+		if(el.attr('checked')=='checked'){
+			$('#submitButton').attr('value','Save');
+		}else{
+			$('#submitButton').attr('value','Save & Submit');
+		}
+	}
+	
+var list = new Array();
+	
+	/**
+	 * Function that show the delete button if some virtual machine are selected, or hide the button if none.
+	 * @param jobId - The virtual machine identifier selected.
+	 */
+	function viewOrHideOperationButton(jobId) {
+		var i = 0;
+		var newlist = new Array();
+		var isPresent = false;
+		for (i = 0; i < list.length; i++) {
+			if (list[i] != jobId) {
+				newlist.push(list[i]);
+			} else {
+				isPresent = true;
+			}
+		}
+	
+		if (isPresent == false)
+			list.push(jobId);
+		else
+			list = newlist;
+	
+		if (list.length == 0) {
+			$(".operationButton").hide("slow");
+		} else {
+			$(".operationButton").show("slow");
+		}
+	}
+	
+	function setAll(element){
+		var val = element.attr('checked');
+		if(val == "checked"){
+			$(".operationCheckbox").attr('checked', true);
+			$(".operationButton").show("slow");
+		}else{
+			$(".operationCheckbox").attr('checked', false);
+			$(".operationButton").hide("slow");
+		}
+		
 	}
 	
 	$(document).ready(function() {
@@ -142,10 +196,27 @@
 	<div id="presentationDirac">My Jobs</div>
 	<div id="contentDirac">
 	
+		<liferay-ui:success key="save-successufully"
+			message="save-successufully" />
+		<liferay-ui:success key="shared-successufully"
+			message="shared-successufully" />
+		<liferay-ui:success key="unshared-successufully"
+			message="unshared-successufully" />
+		<liferay-ui:success key="deleting-template-successufully"
+			message="deleting-template-successufully" />
+	
 		<liferay-ui:error key="submit-error"
 			message="submit-error" />
 		<liferay-ui:error key="check-jdl"
 			message="check-jdl" />	
+		<liferay-ui:error key="deleting-template-error"
+			message="deleting-template-error" />
+		<liferay-ui:error key="save-error"
+			message="save-error" />
+		<liferay-ui:error key="shared-error"
+			message="shared-error" />
+		<liferay-ui:error key="operation-error"
+			message="operation-error" />
 			
 		<portlet:actionURL var="submitUrl">
 			<portlet:param name="myaction" value="submitJob" />
@@ -163,58 +234,112 @@
 				scope="request" />	
 		
 		<c:if test="${jdl.path == '' }">
+			<aui:form>
+			<aui:button-row>
 			<div class="jdlDiv">
-				<aui:button type="button" value="View Template" onClick="changeTemplate();"/>
+				<aui:button type="button" value="Use Template" onClick="changeTemplate();"/>
 			</div>
 			<div class="templates">
-				<aui:button type="button" value="View JDL" onClick="changeTemplate();"/>
+				<aui:button type="button" value="Submit New Job" onClick="changeTemplate();"/>
 			</div>
+			</aui:button-row>
+			</aui:form>
 		</c:if>
 		
-		
 		<div class="templates tempaltesCss">
-		
-			<table id="template_table" class="taglib-search-iterator">
+			<portlet:actionURL var="operationMultipleTemplateUrl">
+				<portlet:param name="myaction" value="operationMultipleTemplate"/>
+			</portlet:actionURL>
 			
-				<thead>
-					<tr  class="portlet-section-header results-header">
-						<th class="col-1 first sorting">Name</th>
-						<th class="col-2 sorting">Type</th>
-						<th class="col-3 sorting">Owner</th>
-						<th class="col-4 last sorting">Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					<c:forEach var="template" items="${templateList }" > 
-						<tr class="results-row portlet-section-alternate-hover effect">
-							<td>${template.name }</td>
-							<td>${template.type }</td>
-							<td>${template.owner }</td>
-							<td>
-								<liferay-ui:icon-menu>
-							
-									<portlet:renderURL var="useTemplateURL">
-										<portlet:param name="myaction" value="showSubmitJob"/>
-										<portlet:param name="path" value="${template.path }"/>
-									</portlet:renderURL>
-									<liferay-ui:icon image="configuration" message="Use" url="${useTemplateURL}" />
-									
-									<c:if test="${template.owner == user.userId}">
-										<portlet:actionURL  var="deleteTemplateURL">
-											<portlet:param name="myaction" value="deleteTemplate"/>
-											<portlet:param name="path" value="${template.path }"/>
-										</portlet:actionURL>
-										<liferay-ui:icon-delete url="${deleteTemplateURL}" />
-									</c:if>
-								
-								</liferay-ui:icon-menu>
-							</td>
+			<form id="multipleTemplateForm" name="opMultForm" action="${operationMultipleTemplateUrl}" method="POST">
+			
+				<div class="operationButton" style="display: none;">
+					<aui:button-row>
+						
+					<aui:button type="submit" value="Delete Templates"
+						onClick="return confirm('Are you sure you want to delete these tempaltes?');" />
+					<aui:button type="button" value="Share templates" onClick="$('#operation').val('share'); $('#multipleTemplateForm').submit();"/>
+					<aui:button type="button" value="Privatize templates" onClick="$('#operation').val('unshare'); $('#multipleTemplateForm').submit();"/>
+					</aui:button-row>
+				</div>
+			
+			
+				<input id="operation" type="hidden" name="operation" value="delete"/>
+				
+				<table id="template_table" class="taglib-search-iterator">
+				
+					<thead>
+						<tr  class="portlet-section-header results-header">
+							<th class="col-1 first sorting">Sel <input type='checkbox' onclick='setAll($(this));'/></th>
+							<th class="col-2 sorting">Name</th>
+							<th class="col-3 sorting">Type</th>
+							<th class="col-4 sorting">Owner</th>
+							<th class="col-5 last sorting">Action</th>
 						</tr>
-					</c:forEach>
-				</tbody>
-			
-			</table>
-			
+					</thead>
+					<tbody>
+						<c:forEach var="template" items="${templateList }" > 
+							<tr class="results-row portlet-section-alternate-hover effect">
+								<td>
+									<c:if test="${template.owner == user.userId}">
+										<input class="operationCheckbox" name="templateList" type="checkbox"
+											value="${template.path }"
+											onchange="viewOrHideOperationButton('${template.path }');"></input>
+									</c:if>
+								</td>
+								<td>${template.name }</td>
+								<td>${template.type }</td>
+								<td>${template.owner }</td>
+								<td style="text-align: right;">
+									<liferay-ui:icon-menu>
+								
+										<portlet:renderURL var="useTemplateURL">
+											<portlet:param name="myaction" value="showSubmitJob"/>
+											<portlet:param name="path" value="${template.path }"/>
+										</portlet:renderURL>
+										<liferay-ui:icon image="edit" message="Edit" url="${useTemplateURL}" />
+										
+										<c:if test="${template.owner == user.userId}">
+											<c:if test="${template.type == 'Private' }">
+												<portlet:actionURL var="shareTemplateURL">
+													<portlet:param name="myaction" value="shareTemplate"/>
+													<portlet:param name="path" value="${template.path }"/>
+												</portlet:actionURL>
+												<liferay-ui:icon image="links" message="Share" url="${shareTemplateURL}" />
+											</c:if>
+											<c:if test="${template.type == 'Shared' }">
+												<portlet:actionURL var="unshareTemplateURL">
+													<portlet:param name="myaction" value="unshareTemplate"/>
+													<portlet:param name="path" value="${template.path }"/>
+												</portlet:actionURL>
+												<liferay-ui:icon image="page" message="Private" url="${unshareTemplateURL}" />
+											</c:if>
+											<portlet:actionURL  var="deleteTemplateURL">
+												<portlet:param name="myaction" value="deleteTemplate"/>
+												<portlet:param name="path" value="${template.path }"/>
+											</portlet:actionURL>
+											<liferay-ui:icon-delete url="${deleteTemplateURL}" />
+										</c:if>
+									
+									</liferay-ui:icon-menu>
+								</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				
+				</table>
+				
+				<div class="operationButton" style="display: none;">
+				<aui:button-row>
+					
+					<aui:button type="submit" value="Delete Templates"
+						onClick="return confirm('Are you sure you want to delete these tempaltes?');" />
+					<aui:button type="button" value="Share templates" onClick="$('#operation').val('share'); $('#multipleJobForm').submit();"/>
+					<aui:button type="button" value="Privatize templates" onClick="$('#operation').val('unshare'); $('#multipleJobForm').submit();"/>
+				</aui:button-row>
+			</div>
+				
+			</form>
 			
 			<aui:form name="back" action="${goHome }">
 			<aui:button-row>
@@ -222,7 +347,7 @@
 			</aui:button-row>
 			</aui:form>
 		</div>	
-		<div class="jdlDiv">
+		<div  class="jdlDiv">
 		<aui:form name="newJdl" action="${submitUrl }" commandName="jdl" enctype="multipart/form-data">
 			<div id="myJdl">
 				<aui:fieldset label="JDL">
@@ -442,6 +567,8 @@
 						
 					</div>
 				</aui:fieldset>
+				
+				
 			</div>
 			<div id="addMenu">
 				<aui:fieldset label="Add or Remove fields">
@@ -506,10 +633,12 @@
 			</div>
 			<div id="reset"></div>
 			<aui:input name="saveAsTemplate" type="checkbox" label="Save As Template" onClick="changeCheckbox($(this), 'shareTemplate', 'saveOnly');"/>
-			<input id="saveOnly" name="saveOnly" type="checkbox"  disabled="disabled"/> <Strong>Save Only</Strong><br/>
+			<div id="checks" style="margin: 0 0 15px 15px; display: none;">
+			<input id="saveOnly" name="saveOnly" type="checkbox"  disabled="disabled" onClick="changeSubmitButton($(this));"/> <Strong>Don't Submit Now</Strong><br/>
 			<input id="shareTemplate" name="shareTemplate" type="checkbox"  disabled="disabled"/> <Strong>Share Template</Strong>
+			</div>
 			<aui:button-row>
-			<aui:button type="submit" value="Submit"/>
+			<aui:button id="submitButton" type="submit" value="Submit"/>
 			<aui:button type="button" value="Back" onClick="${goHome }"/>
 			</aui:button-row>
 		</aui:form>

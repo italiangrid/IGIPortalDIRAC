@@ -2,6 +2,8 @@ package it.italiangrid.portal.dirac.controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.util.DiracUtil;
@@ -28,6 +30,9 @@ public class JobActionController {
 	 * Logger
 	 */
 	private static final Logger log = Logger.getLogger(JobActionController.class);
+	
+	private static List<String> operations = Arrays.asList(new String[]{"delete", "reschedule"});
+	private static List<String> operationsMessages = Arrays.asList(new String[]{"deleting-successufully", "resheduling-successufully"});
 	
 	@ActionMapping(params = "myaction=rescheduleJob")
 	public void getRescheduleJob(ActionRequest request){
@@ -89,21 +94,35 @@ public class JobActionController {
 	@ActionMapping(params = "myaction=deleteMultipleJob")
 	public void getDeleteMultipleJob(@RequestParam int[] jobToDel, ActionRequest request){
 		
-		
 		try {
 			User user = PortalUtil.getUser(request);
 			if (user != null) {
+				DiracAdminUtil util = new DiracAdminUtil();
+				String userPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId();
+				
+				String operation = request.getParameter("operation");
+				log.info("Operation: " + operation);
 				
 				for(int jobId : jobToDel){
-					log.info("Delete job: " + jobId);
+					switch (operations.indexOf(operation)) {
+					case 0: /* delete */
+						log.info("Delete job: " + jobId);
+						
+						util.getDeleteJob(userPath, jobId);
+						break;
+					case 1: /* reschedule */
+						log.info("Reschedule job: " + jobId);
+						
+						util.getRescheduleJob(userPath, jobId);
+						
+						break;
+					default:
+						log.info("Operation Unrecognized");
+					}
 					
-					String userPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId();
-					
-					DiracAdminUtil util = new DiracAdminUtil();
-					util.getDeleteJob(userPath, jobId);
 				}
 				
-				SessionMessages.add(request, "deleting-successufully");
+				SessionMessages.add(request, operationsMessages.get(operations.indexOf(operation)));
 				return;
 				
 			}

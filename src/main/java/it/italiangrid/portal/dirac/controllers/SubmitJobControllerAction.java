@@ -51,6 +51,8 @@ public class SubmitJobControllerAction {
 		
 		try {
 			User user = PortalUtil.getUser(request);
+			
+			UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
 
 			if (user != null) {
 				
@@ -58,7 +60,7 @@ public class SubmitJobControllerAction {
 				 * Prepare temp folder for submission
 				 */
 				
-				UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
+				
 				
 				String path;
 				String diracWrapper = DiracConfig.getProperties("Dirac.properties", "dirac.wrapper.script");
@@ -292,14 +294,14 @@ public class SubmitJobControllerAction {
 						 * user template
 						 */
 						copyPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId()+"/DIRAC/"+ templateHome + "/" + jdl.getJobName().replaceAll(" ", "_")+"@"+user.getUserId();
-						copyPath = checkIfExsist(copyPath);
+						copyPath = DiracUtil.checkIfExsist(copyPath);
 						
 					} else {
 						/*
 						 * shared template
 						 */
 						copyPath = System.getProperty("java.io.tmpdir") + "/"+diracHome+"/"+ templateHome + "/" + jdl.getJobName().replaceAll(" ", "_")+"@"+user.getUserId();
-						copyPath = checkIfExsist(copyPath);
+						copyPath = DiracUtil.checkIfExsist(copyPath);
 					}
 					File destination = new File(copyPath);
 					FileUtil.copyDirectory(jdlFolder, destination);
@@ -313,9 +315,22 @@ public class SubmitJobControllerAction {
 				
 				
 			}
+			boolean saveAsTemplate = Boolean.parseBoolean(uploadRequest.getParameter("saveAsTemplate"));
+			String saveOnly = uploadRequest.getParameter("saveOnly");
+			String shareTemplate = uploadRequest.getParameter("shareTemplate");
 			
-			SessionMessages.add(request, "submit-successufully");
-			
+			if(saveOnly!=null){
+				response.setRenderParameter("myaction", "showSubmitJob");
+				response.setRenderParameter("viewTemplate", "true");
+			}else{
+				SessionMessages.add(request, "submit-successufully");
+			}
+			if(saveAsTemplate){
+				SessionMessages.add(request, "save-successufully");
+			}
+			if(shareTemplate!=null){
+				SessionMessages.add(request, "shared-successufully");
+			}
 			return;
 
 		} catch (Exception e) {
@@ -328,9 +343,6 @@ public class SubmitJobControllerAction {
 				
 				response.setRenderParameter("showUploadCert", "true");
 				
-//				response.setRenderParameter("myaction", "showUploadCert");
-				
-//				return;
 			}else{
 				if (e.getMessage().equals("submit-error")){
 					SessionErrors.add(request, "check-jdl");
@@ -349,29 +361,7 @@ public class SubmitJobControllerAction {
 		
 	}
 
-	private String checkIfExsist(String copyPath) {
-		File path = new File(copyPath);
-		if(path.exists()){
-			String owner = copyPath.split("@")[1];
-			String oldPath = copyPath.split("@")[0];
-			String last = oldPath.substring(oldPath.lastIndexOf("_")+1,oldPath.length());
-			if(!last.contains(".")&&!last.contains(",")){
-				try{
-					int index = Integer.parseInt(last);
-					String prefix = oldPath.substring(0,oldPath.lastIndexOf("_")+1);
-					index++;
-					oldPath=prefix+index;
-				} catch (NumberFormatException e){
-					oldPath += "_1"; 
-				}
-			}else{
-				oldPath += "_1";
-			}
-			copyPath = checkIfExsist(oldPath + "@" + owner);
-		}
-			
-		return copyPath;
-	}
+	
 
 	private boolean isNotificationSetted(User user) {
 		GuseNotifyUtil gnu = new GuseNotifyUtil();
