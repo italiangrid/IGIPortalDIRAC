@@ -574,6 +574,9 @@
 					
 					<div id="inputSanboxDiv" style="display: none;">
 						<label style="margin-top: 10px;" id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> Input SandBox </label>
+						<div class="help">
+							<strong>Help:</strong> If the file name contains white spaces, these will be replaced with '_'.
+						</div>
 						<c:set var="count" value="0"/>
 						
 						<c:forTokens items="${jdl.inputSandbox }" delims="," var="input">
@@ -677,6 +680,19 @@
 </div>
 
 <script type="text/javascript">
+
+	if("${jdl.stdOutput }"!="StdOut"){
+		$("#stdOutputDiv").show();
+		$('#stdoutremove').show();
+		$('#stdoutadd').hide();
+	}
+	
+	if("${jdl.stdError }"!="StdErr"){
+		$("#stdErrorDiv").show();
+		$('#stderrremove').show();
+		$('#stderrremove').hide();
+	}
+
 	if("${jdl.parameters }"!=""){
 		$("#parametersDiv").show();
 		$('#parametersremove').show();

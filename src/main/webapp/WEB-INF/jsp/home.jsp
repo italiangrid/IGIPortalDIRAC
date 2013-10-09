@@ -157,7 +157,7 @@
 			</div>
 			
 			<liferay-ui:search-container
-				emptyResultsMessage="No Jobs" delta="10">
+				emptyResultsMessage="No Jobs" delta="20">
 				<liferay-ui:search-container-results>
 	
 					<%

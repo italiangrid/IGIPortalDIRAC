@@ -628,7 +628,7 @@ public class Jdl {
 			string += "SMPGranularity = " + smpGranularity + ";\n";
 		}
 		if (requirements != null && !requirements.isEmpty()) {
-			string += "Requirements = (" + requirements + ");\n";
+			string += "Requirements = " + requirements + ";\n";
 		}
 		if (myProxyServer != null && !myProxyServer.isEmpty()) {
 			string += "MyProxyServer = \"" + myProxyServer + "\";\n";
@@ -838,26 +838,24 @@ public class Jdl {
 		
 	}
 	
+	
+	
 	private String loadFromFile(String path) throws FileNotFoundException, IOException {
-		File templatePath = new File(path);
 		
-		List<File> listDir = new ArrayList<File>(Arrays.asList(templatePath.listFiles()));
+		String jdlFileName = path.split("@")[0];
+		jdlFileName = jdlFileName.substring(jdlFileName.lastIndexOf("/")+1, jdlFileName.length());
 		
-		File jdlFile = null;
 		
-		for (File file : listDir) {
-			log.info("File: " + file.toString());
-			log.info("Extension: "+ file.toString().substring(file.toString().lastIndexOf(".")+1, file.toString().length()));
-			
-			String extension = file.toString().substring(file.toString().lastIndexOf(".")+1, file.toString().length());
-			log.info("Check: " + extension.equals("jdl"));
-			
-			if(extension.equals("jdl")){
-				log.info("Founded: " + file.toString());
-				jdlFile = file;
-				break;
-			}
+		File jdlFile = new File(path + "/" + jdlFileName + ".jdl");
+		if(!jdlFile.exists()){
+			jdlFileName = jdlFileName.substring(0, jdlFileName.lastIndexOf("_"));
 		}
+		
+		log.info("JDL name: " + jdlFileName);
+		log.info("JDL path: " + path + "/" + jdlFileName + ".jdl");
+		log.info("Exist? " + jdlFile.exists());
+		
+		jdlFile = new File(path + "/" + jdlFileName + ".jdl");
 		
 		BufferedReader br = new BufferedReader(new FileReader(jdlFile));
 	    try {

@@ -140,6 +140,15 @@ public class TemplateList {
 		String userPath = tomcatTemp + "/users/" + this.user + "/DIRAC/" + templateHome;
 		String sharedPath = tomcatTemp + "/" + diracHome + "/" + templateHome;
 		
+		File createUserPath = new File(userPath);
+		File createSharedPath = new File(sharedPath);
+		
+		if(!createUserPath.exists())
+			createUserPath.mkdirs();
+		
+		if(!createSharedPath.exists())
+			createSharedPath.mkdirs();
+		
 		if(isPrivate)
 			return userPath;
 		return sharedPath;

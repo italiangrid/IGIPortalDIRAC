@@ -127,7 +127,7 @@ public class SubmitJobControllerAction {
 		                log.info(parameter +" = "+fileName);
 		                
 		                if(!fileName.isEmpty()){
-		                	
+		                	fileName= fileName.replaceAll(" ", "_");
 		                	log.info("Uploading " + fileName);
 		                
 		                	tempFile = uploadRequest.getFile(parameter, true);
@@ -153,7 +153,7 @@ public class SubmitJobControllerAction {
 				                log.info(parameter +" = "+fileName);
 				                
 				                if(!fileName.isEmpty()){
-				                	
+				                	fileName= fileName.replaceAll(" ", "_");
 				                	needsWrapper = true;
 				                	
 				                	log.info("Uploading exe file: " + fileName);
@@ -252,19 +252,19 @@ public class SubmitJobControllerAction {
 				jdlFile.write(jdl.toString().getBytes());
 				jdlFile.close();
 				
-				/*
-				 * Download proxy
-				 */
-				
-				DiracAdminUtil util = new DiracAdminUtil();
-				util.dowloadUserProxy(path, user.getScreenName(), jdl.getVo()+"_user");
-				
-				/*
-				 * Submit job
-				 */
-				
 				String saveOnly = uploadRequest.getParameter("saveOnly");
 				if(saveOnly==null){
+				
+					/*
+					 * Download proxy
+					 */
+					
+					DiracAdminUtil util = new DiracAdminUtil();
+					util.dowloadUserProxy(path, user.getScreenName(), jdl.getVo()+"_user");
+					
+					/*
+					 * Submit job
+					 */
 					
 					List<Long> ids = util.submitJob(path, path, jdlFilename);
 					
