@@ -4,8 +4,13 @@ import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.db.domain.JobJdls;
 import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.util.DiracConfig;
+import it.italiangrid.portal.dirac.util.DiracUtil;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.CharBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,6 +24,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.log4j.Logger;
+
+import com.liferay.portal.kernel.util.FileUtil;
 
 public class Jdl {
 	
@@ -53,7 +60,7 @@ public class Jdl {
 		"inputSandbox", "outputSandboxRequest", "outputSandbox", "outputSandboxDestUri", "stdOutput", "stdError",
 		"inputData", "outputSE", "outputData", "outputPath", "parameters", "parameterStart",
 		"parameterStep", "cpuNumber", "hostNumber", "wholeNodes", "smpGranularity", "vo", "requirements", "myProxyServer", "path", "site"});
-	private List<String> parameterJDLNames = Arrays.asList(new String[]{ "jobName", "Executable", "Arguments",
+	private List<String> parameterJDLNames = Arrays.asList(new String[]{ "JobName", "Executable", "Arguments",
 			"InputSandbox", "OutputSandboxRequest", "OutputSandbox", "OutputSandboxDestUri", "StdOutput", "StdError",
 			"InputData", "OutputSE", "OutputData", "OutputPath", "Parameters", "ParameterStart",
 			"ParameterStep", "CPUNumber", "HostNumber", "WholeNodes", "SMPGranularity", "VirtualOrganization", "Requirements", "MyProxyServer", "path", "Site"});
@@ -496,7 +503,7 @@ public class Jdl {
 	 */
 	@Override
 	public String toString() {
-		String string = "";
+		String string = "\n";
 		
 //		if (parameters != null) {
 //			string += "JobType = \"Parametric\";\n";
@@ -524,20 +531,20 @@ public class Jdl {
 		if (inputSandbox != null) {
 			string += "InputSandbox = {";
 			for (String s : inputSandbox) {
-				string += "\"" + s + "\", ";
+				string += "\"" + s + "\",";
 			}
 
-			string = string.substring(0, string.length() - 2);
+			string = string.substring(0, string.length() - 1);
 
 			string += "};\n";
 		}
 		if (outputSandbox != null) {
 			string += "OutputSandbox = {";
 			for (String s : outputSandbox) {
-				string += "\"" + s + "\", ";
+				string += "\"" + s + "\",";
 			}
 
-			string = string.substring(0, string.length() - 2);
+			string = string.substring(0, string.length() - 1);
 
 			string += "};\n";
 		}
@@ -547,14 +554,14 @@ public class Jdl {
 				string += "\"" + s + "\", ";
 			}
 
-			string = string.substring(0, string.length() - 2);
+			string = string.substring(0, string.length() - 1);
 
 			string += "};\n";
 		}
 		if (inputData != null) {
 			string += "InputData = {";
 			for (String s : inputData) {
-				string += "\"" + s + "\", ";
+				string += "\"" + s + "\",";
 			}
 
 			string = string.substring(0, string.length() - 2);
@@ -569,16 +576,16 @@ public class Jdl {
 			for (List<String> list : outputData) {
 				string += "[";
 				if (!list.get(0).equals("noData")) {
-					string += "OutputFile = " + list.get(0) + "; ";
+					string += "OutputFile = " + list.get(0) + ";";
 				}
 				if (!list.get(1).equals("noData")) {
-					string += "StorageElement = " + list.get(1) + "; ";
+					string += "StorageElement = " + list.get(1) + ";";
 				}
 				if (!list.get(2).equals("noData")) {
-					string += "LogicalFileName = " + list.get(2) + "; ";
+					string += "LogicalFileName = " + list.get(2) + ";";
 				}
 				string = string.substring(0, string.length() - 2);
-				string += "], ";
+				string += "],";
 			}
 
 			string = string.substring(0, string.length() - 2);
@@ -598,7 +605,7 @@ public class Jdl {
 				if(!parameters.isEmpty()){
 					string += "Parameters = {";
 					for (String s : parameters.split(";")) {
-						string += "\"" + s + "\", ";
+						string += "\"" + s + "\",";
 					}
 	
 					string = string.substring(0, string.length() - 2);
@@ -629,7 +636,7 @@ public class Jdl {
 		if (site != null && !site.isEmpty() && !site.equals("ANY")) {
 			string += "Site = \"" + site + "\";\n";
 		}
-
+		string+="\n";
 		return string;
 	}
 
@@ -664,10 +671,16 @@ public class Jdl {
 		case 24: this.site = (String) value; break;
 		}
 	}
-
-	public void copyJob(JobJdls diracJdl, long userId) throws DiracException {
-	
+	public void copyJob(JobJdls diracJdl, long userId) throws DiracException, IOException {
 		String diracJdlString = new String(diracJdl.getJdl());
+		copyJob(diracJdlString, userId, false, null);
+	}
+
+	public void copyJob(String diracJdlString, long userId, boolean isTemplate, String templatePath) throws DiracException, IOException {
+	
+		if(isTemplate){
+			diracJdlString = loadFromFile(templatePath);
+		}
 		
 		log.info(diracJdlString);
 		
@@ -782,8 +795,7 @@ public class Jdl {
 			}
 		}
 		
-		row = grep(cb, "JobID");
-		String jobId = row.substring(row.indexOf("=")+2, row.length()-2);
+		
 		
 		if(haveWrapper){
 			this.executable = this.inputSandbox.get(1).substring(this.inputSandbox.get(1).lastIndexOf("/")+1, this.inputSandbox.get(1).length());
@@ -801,7 +813,13 @@ public class Jdl {
 			}
 		}
 		
-		getInputSandboxFile(userId, jobId);
+		if(isTemplate){
+			getInputTemplate(userId, templatePath);
+		}else{
+			row = grep(cb, "JobID");
+			String jobId = row.substring(row.indexOf("=")+2, row.length()-2);
+			getInputSandboxFile(userId, jobId);
+		}
 		
 		this.outputSandboxRequest = "";
 		for(int i = 0; i < this.outputSandbox.size(); i++){
@@ -820,6 +838,71 @@ public class Jdl {
 		
 	}
 	
+	private String loadFromFile(String path) throws FileNotFoundException, IOException {
+		File templatePath = new File(path);
+		
+		List<File> listDir = new ArrayList<File>(Arrays.asList(templatePath.listFiles()));
+		
+		File jdlFile = null;
+		
+		for (File file : listDir) {
+			log.info("File: " + file.toString());
+			log.info("Extension: "+ file.toString().substring(file.toString().lastIndexOf(".")+1, file.toString().length()));
+			
+			String extension = file.toString().substring(file.toString().lastIndexOf(".")+1, file.toString().length());
+			log.info("Check: " + extension.equals("jdl"));
+			
+			if(extension.equals("jdl")){
+				log.info("Founded: " + file.toString());
+				jdlFile = file;
+				break;
+			}
+		}
+		
+		BufferedReader br = new BufferedReader(new FileReader(jdlFile));
+	    try {
+	        StringBuilder sb = new StringBuilder();
+	        String line = br.readLine();
+
+	        while (line != null) {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = br.readLine();
+	        }
+	        return sb.toString();
+	    } finally {
+	        br.close();
+	    }
+		
+	}
+
+	private void getInputTemplate(long userId, String templatePath) throws IOException {
+		/*
+		 * Create folder, and save path into field
+		 */
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+		Calendar cal = new GregorianCalendar();
+		Date now = cal.getTime();
+		
+		
+		String tmpDir = "JDL_"+sdf.format(now);
+		String userPath = System.getProperty("java.io.tmpdir") + "/users/"+userId;
+		String path = userPath + "/DIRAC/jdls/"+tmpDir;
+		
+		File jdlFolder = new File(path);
+		jdlFolder.mkdirs();
+		
+		this.path = path;
+		
+		/*
+		 * Move file into created folder
+		 */
+		
+		File originFolder = new File(templatePath);
+		FileUtil.copyDirectory(originFolder, jdlFolder);
+		
+	}
+
 	private void getInputSandboxFile(long userId, String jobId) throws DiracException {
 		/*
 		 * Create folder, and save path into field
@@ -850,19 +933,10 @@ public class Jdl {
 		 */
 		
 		File originFolder = new File(path+"/InputSandbox"+jobId);
-		if(originFolder.isDirectory()) {
-		    File[] content = originFolder.listFiles();
-		    for(int i = 0; i < content.length; i++) {
-		        content[i].renameTo(new File(path+"/"+content[i].getName()));
-		        log.info("File " + content[i].getName() + "moved:\nFrom: " + originFolder.getAbsolutePath() + "\nTo:   " + path+"/"+content[i].getName());
-		    }
-		}
 		
-		/*
-		 * Remove old folder
-		 */
+		DiracUtil.mv(originFolder, path);
 		
-		originFolder.delete();
+		
 	}
 
 	// Pattern used to parse lines

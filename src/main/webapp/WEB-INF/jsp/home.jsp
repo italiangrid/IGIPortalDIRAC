@@ -49,12 +49,38 @@
 		if(${isAllJobsTerminate}==false){
 			setTimeout(function(){
 				location.href='${reloadPage}';
-		    }, 20000);
+		    }, 60000);
 		}
+		
+		$('.search-results').hide();
 	});
 	
 	
 </script>
+
+<style type="text/css">
+
+#buttonBar{
+	margin-bottom: 10px;
+}
+
+.aui-button-content{
+	margin-right: 10px;
+}
+
+.status{
+	margin-top: 7px;
+}
+
+.minorStatus{
+	color: grey;
+}
+
+.first{
+	text-align: center !important ;
+}
+
+</style>
 
 <div id="containerDirac">
 	<div id="presentationDirac">My Jobs</div>
@@ -62,12 +88,16 @@
 	
 		<liferay-ui:success key="submit-successufully"
 			message="submit-successufully" />
-			<liferay-ui:success key="upload-successufully"
+		<liferay-ui:success key="upload-successufully"
 			message="upload-successufully" />
 		<liferay-ui:success key="resheduling-successufully"
 			message="resheduling-successufully" />
 		<liferay-ui:success key="deleting-successufully"
 			message="deleting-successufully" />
+		<liferay-ui:success key="save-successufully"
+			message="save-successufully" />
+		<liferay-ui:success key="shared-successufully"
+			message="shared-successufully" />
 			
 		<liferay-ui:error key="rescheduling-error"
 			message="rescheduling-error" />
@@ -82,11 +112,18 @@
 			<portlet:param name="myaction" value="showHome" />
 		</liferay-portlet:renderURL>
 		
-		<aui:fieldset>
+		<portlet:renderURL var="manageTemplateUrl">
+			<portlet:param name="myaction" value="showSubmitJob" />
+			<portlet:param name="viewTemplate" value="true" />
+		</portlet:renderURL>
+		
+		<div id="buttonBar">
+		<aui:fieldset >
 		<aui:column columnWidth="50">
 			<aui:form action="${submitUrl }">
 				<aui:button-row>
 					<aui:button type="submit" value="Submit New Job"/>
+					<aui:button type="button" value="Manage Job Template" onClick="${manageTemplateUrl }"/>
 				</aui:button-row>
 			</aui:form>
 		</aui:column>
@@ -99,24 +136,28 @@
 			</aui:form>
 		</aui:column>
 		</aui:fieldset>
-		
+		</div>
 		<jsp:useBean id="jobs"
 				type="java.util.List<it.italiangrid.portal.dirac.db.domain.Jobs>"
 				scope="request" />
 		<portlet:actionURL var="deleteMultipleJob">
 			<portlet:param name="myaction" value="deleteMultipleJob"/>
-		</portlet:actionURL>		
-		<form name="delMultForm" action="${deleteMultipleJob}" method="POST">
+		</portlet:actionURL>	
+		
+		<form id="multipleJobForm" name="delMultForm" action="${deleteMultipleJob}" method="POST">
+			<input id="operation" type="hidden" name="operation" value="delete"/>
 			
 			<div class="deleteButton" style="display: none;">
 				<aui:button-row>
-					<aui:button type="submit" value="Delete Selected Jobs"
+					
+					<aui:button type="submit" value="Delete Jobs"
 						onClick="return confirm('Are you sure you want to delete these jobs?');" />
+					<aui:button type="button" value="Reschedule Jobs" onClick="$('#operation').val('reschedule'); $('#multipleJobForm').submit();"/>
 				</aui:button-row>
 			</div>
 			
 			<liferay-ui:search-container
-				emptyResultsMessage="No Jobs" delta="20">
+				emptyResultsMessage="No Jobs" delta="10">
 				<liferay-ui:search-container-results>
 	
 					<%
@@ -134,7 +175,7 @@
 					className="it.italiangrid.portal.dirac.db.domain.Jobs"
 					keyProperty="jobId" modelVar="job">
 					
-					<liferay-ui:search-container-column-text name="Del <input type='checkbox' onclick='setAll($(this));'/>">
+					<liferay-ui:search-container-column-text name="Sel <input type='checkbox' onclick='setAll($(this));'/>">
 						<input class="deleteCheckbox" name="jobToDel" type="checkbox"
 							value="${job.jobId }"
 							onchange="viewOrHideDeleteButton('${job.jobId }');"></input>
@@ -148,8 +189,11 @@
 							</portlet:renderURL>
 					<a href="#" onclick="$(this).modal3({width:600, height:450, message:true, redirect:'${homeUrl}', src: '${getJdlURLonName}'}).open();">${job.jobName }</a>
 					</liferay-ui:search-container-column-text>
-					<liferay-ui:search-container-column-text name="Submission Time"
-						property="submissionTime" />	
+					<liferay-ui:search-container-column-text name="Submitted"
+						>${job.submissionTime } </liferay-ui:search-container-column-text>	
+					<liferay-ui:search-container-column-text name="Site"
+						property="site" />
+							
 						
 					<liferay-ui:search-container-column-text name="Status">
 						<c:choose>
@@ -172,7 +216,7 @@
 								<div id="runningStatus" class="status"></div>
 							</c:otherwise>
 						</c:choose>
-						<div id="status value">${job.status }</div>
+						<div id="status value"><strong>${job.status }</strong> at ${job.heartBeatTime } <br/> <span class="minorStatus">${job.minorStatus }</span></div>
 						<div id="reset"></div>
 					</liferay-ui:search-container-column-text>
 						
@@ -218,8 +262,9 @@
 			</liferay-ui:search-container>
 			<div class="deleteButton" style="display: none;">
 				<aui:button-row>
-					<aui:button type="submit" value="Delete Selected Jobs"
+					<aui:button type="submit" value="Delete Jobs"
 						onClick="return confirm('Are you sure you want to delete these jobs?');" />
+					<aui:button type="button" value="Reschedule Jobs" onClick="$('#operation').val('reschedule'); $('#multipleJobForm').submit();"/>
 				</aui:button-row>
 			</div>
 		</form>

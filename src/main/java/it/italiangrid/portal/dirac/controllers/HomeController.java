@@ -14,7 +14,6 @@ import it.italiangrid.portal.dirac.db.service.JobsService;
 import it.italiangrid.portal.dirac.db.service.ProxiesService;
 import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.util.DiracConfig;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -168,4 +167,5 @@ public class HomeController {
 		}
 		return "https://portal.italiangrid.it/job";
 	}
+	
 }

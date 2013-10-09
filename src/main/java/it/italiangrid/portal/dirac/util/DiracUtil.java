@@ -12,8 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -23,7 +25,7 @@ public class DiracUtil {
 	
 	private static final Logger log = Logger.getLogger(DiracUtil.class);
 	
-	public static Jdl parseJdl(JobJdls diracJdl, long userId) throws DiracException{
+	public static Jdl parseJdl(JobJdls diracJdl, long userId) throws DiracException, IOException{
 		
 		Jdl myJdl = new Jdl();
 		
@@ -32,6 +34,23 @@ public class DiracUtil {
 		myJdl.setJobName("Portal_Job_Copy_of_" + diracJdl.getJobId());
 		
 		return myJdl;
+	}
+	
+	public static Jdl getTemplate(long userId, String path) throws DiracException, IOException{
+		
+		Jdl myJdl = new Jdl();
+		
+		myJdl.copyJob(null, userId, true, path);
+		
+		myJdl.setJobName("Job_Template_" + myJdl.getJobName());
+		
+		return myJdl;
+	}
+	
+	public static List<String> getTemplates(int userId){
+		List<String> result = new ArrayList<String>();
+		
+		return result;
 	}
 
 	public static void delete(File file)
@@ -73,7 +92,7 @@ public class DiracUtil {
     }
 	
 	@SuppressWarnings("resource")
-	public static void zip(File directory, File zipfile) throws IOException {
+	public static void zip(File directory, File zipfile) throws Exception {
 		URI base = directory.toURI();
 		Deque<File> queue = new LinkedList<File>();
 		queue.push(directory);
@@ -97,7 +116,9 @@ public class DiracUtil {
 					}
 				}
 			}
-		} finally {
+		}catch(Exception e){ 
+			res.close();
+		}finally {
 			res.close();
 		}
 	}
@@ -131,6 +152,50 @@ public class DiracUtil {
 		} finally {
 			out.close();
 		}
+	}
+
+	public static String checkIfExsist(String copyPath) {
+		File path = new File(copyPath);
+		if(path.exists()){
+			String owner = copyPath.split("@")[1];
+			String oldPath = copyPath.split("@")[0];
+			String last = oldPath.substring(oldPath.lastIndexOf("_")+1,oldPath.length());
+			if(!last.contains(".")&&!last.contains(",")){
+				try{
+					int index = Integer.parseInt(last);
+					String prefix = oldPath.substring(0,oldPath.lastIndexOf("_")+1);
+					index++;
+					oldPath=prefix+index;
+				} catch (NumberFormatException e){
+					oldPath += "_1"; 
+				}
+			}else{
+				oldPath += "_1";
+			}
+			copyPath = checkIfExsist(oldPath + "@" + owner);
+		}
+			
+		return copyPath;
+	}
+
+	public static void mv(File source, String destination) {
+		
+		File destFolder = new File(destination);
+		
+		destFolder.mkdir();
+		
+		if(source.isDirectory()) {
+		    File[] content = source.listFiles();
+		    for(int i = 0; i < content.length; i++) {
+		        content[i].renameTo(new File(destination+"/"+content[i].getName()));
+		        log.info("File " + content[i].getName() + "moved:\nFrom: " + source.getAbsolutePath() + "\nTo:   " + destination+"/"+content[i].getName());
+		    }
+		}
+		
+		source.delete();
+		
+		
+		
 	}
 	
 }

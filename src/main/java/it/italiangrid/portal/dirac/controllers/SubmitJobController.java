@@ -13,8 +13,10 @@ import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.db.service.JobJdlsService;
 import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.model.Jdl;
+import it.italiangrid.portal.dirac.model.Template;
 import it.italiangrid.portal.dirac.util.DiracConfig;
 import it.italiangrid.portal.dirac.util.DiracUtil;
+import it.italiangrid.portal.dirac.util.TemplateList;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,28 +59,34 @@ public class SubmitJobController {
 	
 	@ModelAttribute("jdl")
 	public Jdl newJob(RenderRequest request){
-		
+		Jdl jdl = new Jdl();
 		try {
+			
 			User user = PortalUtil.getUser(request);
 			if(request.getParameter("jobId")!=null){
 				
 				int jobId = Integer.parseInt(request.getParameter("jobId"));
 				log.info("jobId: " + jobId);
 				
-				Jdl jdl = DiracUtil.parseJdl(jobJdlsService.findById(jobId), user.getUserId());
+				jdl = DiracUtil.parseJdl(jobJdlsService.findById(jobId), user.getUserId());
 				
 				log.info("Duplicated jdl:");
 				log.info(jdl);
-			
-				return jdl;
-				
 				
 			}
+			String path = request.getParameter("path");
+			if(path!=null){
+				log.info("Use Template: "+ path);
+				jdl = DiracUtil.getTemplate(user.getUserId(), path);
+				log.info("Template jdl:");
+				log.info(jdl);
+			}
+			
 		} catch (Exception e){
 			e.printStackTrace();
 		}
 		
-		return new Jdl();
+		return jdl;
 		
 	}
 	
@@ -179,6 +187,34 @@ public class SubmitJobController {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@ModelAttribute("templateList")
+	public List<Template> getTemplates(RenderRequest request){
+		try {
+			User user = PortalUtil.getUser(request);
+
+			if (user != null) {
+				TemplateList tl = new TemplateList(user.getUserId());
+				tl.load();
+				return tl.getTemplates();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new TemplateList().getTemplates();	
+	}
+	
+	@ModelAttribute("viewTemplate")
+	public boolean viewTempalte(RenderRequest request){
+		
+		String value = request.getParameter("viewTemplate");
+		if(value!= null && Boolean.parseBoolean(value))
+			return true;
+		
+		return false;
+		
 	}
 	
 }

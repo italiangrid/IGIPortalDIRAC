@@ -51,6 +51,8 @@ public class SubmitJobControllerAction {
 		
 		try {
 			User user = PortalUtil.getUser(request);
+			
+			UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
 
 			if (user != null) {
 				
@@ -58,10 +60,12 @@ public class SubmitJobControllerAction {
 				 * Prepare temp folder for submission
 				 */
 				
-				UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(request);
+				
 				
 				String path;
 				String diracWrapper = DiracConfig.getProperties("Dirac.properties", "dirac.wrapper.script");
+				String diracHome = DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir");
+				String templateHome = DiracConfig.getProperties("Dirac.properties", "dirac.template.home");
 				
 				log.info(uploadRequest.getParameter("settedPath")!=null?uploadRequest.getParameter("settedPath"):"is null");
 				
@@ -204,10 +208,12 @@ public class SubmitJobControllerAction {
 					}
 				}
 				jdl.setOutputSandbox(outputSandbox);
+				
+				log.info("OutputSandbox: " + jdl.getOutputSandbox());
 		        
 				if(needsWrapper){
 					
-					String wrapperPath = System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir") + "/" + diracWrapper;
+					String wrapperPath = System.getProperty("java.io.tmpdir") + "/" + diracHome + "/" + diracWrapper;
 					List<String> newIS = new ArrayList<String>();
 					newIS.add(wrapperPath);
 					if(!inputSandbox.isEmpty()){
@@ -257,18 +263,52 @@ public class SubmitJobControllerAction {
 				 * Submit job
 				 */
 				
-				List<Long> ids = util.submitJob(path, path, jdlFilename);
+				String saveOnly = uploadRequest.getParameter("saveOnly");
+				if(saveOnly==null){
+					
+					List<Long> ids = util.submitJob(path, path, jdlFilename);
+					
+					/*
+					 * Adding notify task
+					 */
+					boolean isNotify = isNotificationSetted(user);
+					
+					log.info("notify = " + isNotify);
+					if(isNotify){
+						Notify notify = new Notify(user.getEmailAddress(), user.getFirstName(), ids);
+						Checker.addNotify(notify);
+					}
+				}
 				
 				/*
-				 * Adding notify task
+				 * Manage Template
 				 */
-				boolean isNotify = isNotificationSetted(user);
+				String saveAsTemplate = uploadRequest.getParameter("saveAsTemplate");
+				String shareTemplate = uploadRequest.getParameter("shareTemplate");
 				
-				log.info("notify = " + isNotify);
-				if(isNotify){
-					Notify notify = new Notify(user.getEmailAddress(), user.getFirstName(), ids);
-					Checker.addNotify(notify);
+				log.info("saveAsTempalte: " + saveAsTemplate);				
+				log.info("shareTemplate: " + shareTemplate);
+				
+				if(saveAsTemplate!=null){
+					String copyPath;
+					if(shareTemplate==null){
+						/*
+						 * user template
+						 */
+						copyPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId()+"/DIRAC/"+ templateHome + "/" + jdl.getJobName().replaceAll(" ", "_")+"@"+user.getUserId();
+						copyPath = DiracUtil.checkIfExsist(copyPath);
+						
+					} else {
+						/*
+						 * shared template
+						 */
+						copyPath = System.getProperty("java.io.tmpdir") + "/"+diracHome+"/"+ templateHome + "/" + jdl.getJobName().replaceAll(" ", "_")+"@"+user.getUserId();
+						copyPath = DiracUtil.checkIfExsist(copyPath);
+					}
+					File destination = new File(copyPath);
+					FileUtil.copyDirectory(jdlFolder, destination);
 				}
+				
 				
 				/*
 				 * Delete temp folder
@@ -277,9 +317,22 @@ public class SubmitJobControllerAction {
 				
 				
 			}
+			String saveAsTemplate = uploadRequest.getParameter("saveAsTemplate");
+			String saveOnly = uploadRequest.getParameter("saveOnly");
+			String shareTemplate = uploadRequest.getParameter("shareTemplate");
 			
-			SessionMessages.add(request, "submit-successufully");
-			
+			if(saveOnly!=null){
+				response.setRenderParameter("myaction", "showSubmitJob");
+				response.setRenderParameter("viewTemplate", "true");
+			}else{
+				SessionMessages.add(request, "submit-successufully");
+			}
+			if(saveAsTemplate!=null){
+				SessionMessages.add(request, "save-successufully");
+			}
+			if(shareTemplate!=null){
+				SessionMessages.add(request, "shared-successufully");
+			}
 			return;
 
 		} catch (Exception e) {
@@ -292,9 +345,6 @@ public class SubmitJobControllerAction {
 				
 				response.setRenderParameter("showUploadCert", "true");
 				
-//				response.setRenderParameter("myaction", "showUploadCert");
-				
-//				return;
 			}else{
 				if (e.getMessage().equals("submit-error")){
 					SessionErrors.add(request, "check-jdl");
@@ -312,6 +362,8 @@ public class SubmitJobControllerAction {
 		request.setAttribute("jdl", jdl);
 		
 	}
+
+	
 
 	private boolean isNotificationSetted(User user) {
 		GuseNotifyUtil gnu = new GuseNotifyUtil();

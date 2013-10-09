@@ -1,4 +1,7 @@
 <%@ include file="/WEB-INF/jsp/init.jsp"%>
+
+<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
+
 <script type="text/javascript">
 	var count = 0;
 	function deleteFile(divName){
@@ -46,29 +49,333 @@
 		}
 	}
 	
+	function changeCheckbox(input, share, saveOnly){
+		if(input.attr('checked')=='checked'){
+			$("#"+share).removeAttr("disabled");
+			$("#"+saveOnly).removeAttr("disabled");
+			$('#submitButton').attr('value','Save & Submit');
+			$('#checks').show('slow');
+		}else{
+			$("#"+share).attr("disabled", true);
+			$("#"+share).removeAttr("checked");
+			$("#"+saveOnly).attr("disabled", true);
+			$("#"+saveOnly).removeAttr("checked");
+			$('#submitButton').attr('value','Submit');
+			$('#checks').hide('slow');
+		}
+	}
+	
+	function changeTemplate(){
+		if ($('.templates').css('display') == 'none') {
+			$('.templates').show('slow');
+			$('.jdlDiv').hide('slow');
+		}else{
+			$('.templates').hide('slow');
+			$('.jdlDiv').show('slow');
+			$("#saveAsTemplate").attr('checked', true);
+			$("#saveOnly").attr('checked', true);
+			changeCheckbox($('#saveAsTemplate'), 'shareTemplate', 'saveOnly');
+			changeSubmitButton($('#saveOnly'))
+		}
+	}
+	
+	function changeSubmitButton(el){
+		if(el.attr('checked')=='checked'){
+			$('#submitButton').attr('value','Save');
+		}else{
+			$('#submitButton').attr('value','Save & Submit');
+		}
+	}
+	
+	var list = new Array();
+	
+	/**
+	 * Function that show the delete button if some virtual machine are selected, or hide the button if none.
+	 * @param jobId - The virtual machine identifier selected.
+	 */
+	function viewOrHideOperationButton(jobId) {
+		var i = 0;
+		var newlist = new Array();
+		var isPresent = false;
+		for (i = 0; i < list.length; i++) {
+			if (list[i] != jobId) {
+				newlist.push(list[i]);
+			} else {
+				isPresent = true;
+			}
+		}
+	
+		if (isPresent == false)
+			list.push(jobId);
+		else
+			list = newlist;
+	
+		if (list.length == 0) {
+			$(".operationButton").hide("slow");
+		} else {
+			$(".operationButton").show("slow");
+		}
+	}
+	
+	function setAll(element){
+		var val = element.attr('checked');
+		if(val == "checked"){
+			$(".operationCheckbox").attr('checked', true);
+			$(".operationButton").show("slow");
+		}else{
+			$(".operationCheckbox").attr('checked', false);
+			$(".operationButton").hide("slow");
+		}
+		
+	}
+	
 	$(document).ready(function() {
 		appendExecutable();
+		$('#template_table').dataTable();
 		//appendInputSandbox();
 		});
 </script>
+
+<style type="text/css">
+
+.templates{
+	display: none; 
+}
+
+.tempaltesCss{
+	margin: 10px;
+}
+
+#template_table_wrapper{
+	width: 100%;
+}
+
+.sorting_disabled{
+	display: none;
+}
+
+#template_table{
+	background-color: white;
+}
+
+#template_table_length{
+	float: left;
+	margin-left: 5px;
+}
+
+#template_table_filter{
+	float: right;
+	margin-right: 5px;
+}
+
+#template_table_info{
+	float: left;
+	margin-left: 5px;
+}
+
+#template_table_paginate{
+	float: right;
+	margin-right: 5px;
+	margin-bottom: 10px;
+}
+
+#template_table_paginate a{
+	padding-left: 5px;
+}
+	
+.even {
+	background-color: #F5F8FB;
+}
+
+.effect:hover td{
+	background:  #D3E8F1;
+	border: 1px solid #D3E8F1;
+	border-bottom-color: #D7D7D7;
+}
+.jdlDiv{
+	display: none;
+}
+
+.aui-button-content{
+	margin: 10px 10px 0 0;
+}
+.ownerYes{
+	color: green;
+}
+.ownerNo{
+	color: red;
+}
+.center{
+	text-align: center;
+}
+.first{
+	text-align: center !important;
+	width: 40px;
+}
+</style>
 
 <div id="containerDirac">
 	<div id="presentationDirac">My Jobs</div>
 	<div id="contentDirac">
 	
+		<liferay-ui:success key="save-successufully"
+			message="save-successufully" />
+		<liferay-ui:success key="shared-successufully"
+			message="shared-successufully" />
+		<liferay-ui:success key="unshared-successufully"
+			message="unshared-successufully" />
+		<liferay-ui:success key="deleting-template-successufully"
+			message="deleting-template-successufully" />
+	
 		<liferay-ui:error key="submit-error"
 			message="submit-error" />
 		<liferay-ui:error key="check-jdl"
 			message="check-jdl" />	
+		<liferay-ui:error key="deleting-template-error"
+			message="deleting-template-error" />
+		<liferay-ui:error key="save-error"
+			message="save-error" />
+		<liferay-ui:error key="shared-error"
+			message="shared-error" />
+		<liferay-ui:error key="operation-error"
+			message="operation-error" />
 			
 		<portlet:actionURL var="submitUrl">
 			<portlet:param name="myaction" value="submitJob" />
 		</portlet:actionURL>
+		<portlet:actionURL var="goHome">
+			<portlet:param name="myaction" value="goHome"></portlet:param>
+			<portlet:param name="settedPath" value="${jdl.path }"></portlet:param>
+		</portlet:actionURL>
 		
 		<jsp:useBean id="vos"
 				type="java.util.List<it.italiangrid.portal.dbapi.domain.Vo>"
-				scope="request" />		
+				scope="request" />
+		<jsp:useBean id="templateList"
+				type="java.util.List<it.italiangrid.portal.dirac.model.Template>"
+				scope="request" />	
 		
+		<c:if test="${jdl.path == '' }">
+			<aui:form>
+			<aui:button-row>
+			<div class="jdlDiv">
+				<aui:button type="button" value="Use Template" onClick="changeTemplate();"/>
+			</div>
+			</aui:button-row>
+			</aui:form>
+		</c:if>
+		
+		<div class="templates tempaltesCss">
+			<portlet:actionURL var="operationMultipleTemplateUrl">
+				<portlet:param name="myaction" value="operationMultipleTemplate"/>
+			</portlet:actionURL>
+			
+			<form id="multipleTemplateForm" name="opMultForm" action="${operationMultipleTemplateUrl}" method="POST">
+			
+				<div class="operationButton" style="display: none;">
+					<aui:button-row>
+						
+					<aui:button type="submit" value="Delete"
+						onClick="return confirm('Are you sure you want to delete these tempaltes?');" />
+					<aui:button type="button" value="Share" onClick="$('#operation').val('share'); $('#multipleTemplateForm').submit();"/>
+					<aui:button type="button" value="Private" onClick="$('#operation').val('unshare'); $('#multipleTemplateForm').submit();"/>
+					</aui:button-row>
+				</div>
+			
+			
+				<input id="operation" type="hidden" name="operation" value="delete"/>
+				
+				<table id="template_table" class="taglib-search-iterator">
+				
+					<thead>
+						<tr  class="portlet-section-header results-header">
+							<th class="col-1 first sorting">Sel <input type='checkbox' onclick='setAll($(this));'/></th>
+							<th class="col-2 sorting">Name</th>
+							<th class="col-3 sorting center">Type</th>
+							<th class="col-4 sorting center">Owner</th>
+							<th class="col-5 last sorting">Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="template" items="${templateList }" > 
+							<tr class="results-row portlet-section-alternate-hover effect">
+								<td class="center">
+									<c:if test="${template.owner == user.userId}">
+										<input class="operationCheckbox" name="templateList" type="checkbox"
+											value="${template.path }"
+											onchange="viewOrHideOperationButton('${template.path }');"></input>
+									</c:if>
+								</td>
+								<td>${template.name }</td>
+								<td  class="center">${template.type }</td>
+								<td  class="center">
+									<c:if test="${template.owner == user.userId}">
+										<span class="ownerYes">Yes</span>
+									</c:if>
+									<c:if test="${template.owner != user.userId}">
+										<span class="ownerNo">No</span>
+									</c:if>
+								</td>
+								<td style="text-align: right;">
+									<liferay-ui:icon-menu>
+								
+										<portlet:renderURL var="useTemplateURL">
+											<portlet:param name="myaction" value="showSubmitJob"/>
+											<portlet:param name="path" value="${template.path }"/>
+										</portlet:renderURL>
+										<liferay-ui:icon image="edit" message="Edit" url="${useTemplateURL}" />
+										
+										<c:if test="${template.owner == user.userId}">
+											<c:if test="${template.type == 'Private' }">
+												<portlet:actionURL var="shareTemplateURL">
+													<portlet:param name="myaction" value="shareTemplate"/>
+													<portlet:param name="path" value="${template.path }"/>
+												</portlet:actionURL>
+												<liferay-ui:icon image="links" message="Share" url="${shareTemplateURL}" />
+											</c:if>
+											<c:if test="${template.type == 'Shared' }">
+												<portlet:actionURL var="unshareTemplateURL">
+													<portlet:param name="myaction" value="unshareTemplate"/>
+													<portlet:param name="path" value="${template.path }"/>
+												</portlet:actionURL>
+												<liferay-ui:icon image="page" message="Private" url="${unshareTemplateURL}" />
+											</c:if>
+											<portlet:actionURL  var="deleteTemplateURL">
+												<portlet:param name="myaction" value="deleteTemplate"/>
+												<portlet:param name="path" value="${template.path }"/>
+											</portlet:actionURL>
+											<liferay-ui:icon-delete url="${deleteTemplateURL}" />
+										</c:if>
+									
+									</liferay-ui:icon-menu>
+								</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				
+				</table>
+				
+				<c:if test="${fn:length(templateList) > 15 }">
+					<div class="operationButton" style="display: none;">
+						<aui:button-row>
+							
+							<aui:button type="submit" value="Delete"
+								onClick="return confirm('Are you sure you want to delete these tempaltes?');" />
+							<aui:button type="button" value="Share" onClick="$('#operation').val('share'); $('#multipleJobForm').submit();"/>
+							<aui:button type="button" value="Private" onClick="$('#operation').val('unshare'); $('#multipleJobForm').submit();"/>
+						</aui:button-row>
+					</div>
+				</c:if>
+			</form>
+			
+			<aui:form name="back" action="${goHome }">
+			<aui:button-row>
+			<aui:button type="button" value="Create New Template" onClick="changeTemplate();"/>
+			<aui:button type="submit" value="Job List"/>
+			</aui:button-row>
+			</aui:form>
+		</div>	
+		<div  class="jdlDiv">
 		<aui:form name="newJdl" action="${submitUrl }" commandName="jdl" enctype="multipart/form-data">
 			<div id="myJdl">
 				<aui:fieldset label="JDL">
@@ -288,6 +595,8 @@
 						
 					</div>
 				</aui:fieldset>
+				
+				
 			</div>
 			<div id="addMenu">
 				<aui:fieldset label="Add or Remove fields">
@@ -307,6 +616,7 @@
 					<a href="#inputSanboxDiv" onclick="addFile();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Input Sandbox</a>
 					</div>	
 					<hr/>
+					<div style="display: none;">
 					<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> MPI </label>
 					<div>
 					<a id="cpuadd" href="#cpuNumberDiv" onclick="$('#cpuNumberDiv').show(); setTimeout( function() { $('#cpuNumberDiv input').focus(); }, 200 ); $('#cpuremove').show(); $('#cpuadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> CPU Number</a>
@@ -325,6 +635,7 @@
 					<a id="smpremove" style="display: none;" href="#smpGranularityDiv" onclick="$('#smpGranularityDiv').hide(); $('#smpadd').show(); $('#smpremove').hide(); $('#smpGranularityDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> SMP Granularity</a>
 					</div>
 					<hr/>
+					</div>
 					<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> PARAMETRIC </label>
 					<div>
 					<a id="parametersadd" href="#parametersDiv" onclick="$('#parametersDiv').show(); $('#parametersremove').show(); $('#parametersadd').hide(); setTimeout( function() { $('#parametersDiv input').focus(); }, 200 );"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameters</a>
@@ -351,15 +662,17 @@
 				</aui:fieldset>	
 			</div>
 			<div id="reset"></div>
+			<input id="saveAsTemplate" name="saveAsTemplate" type="checkbox" onClick="changeCheckbox($(this), 'shareTemplate', 'saveOnly');"/> <Strong>Save As Template</Strong><br/>
+			<div id="checks" style="margin: 0 0 0 15px; display: none;">
+			<input id="saveOnly" name="saveOnly" type="checkbox"  disabled="disabled" onClick="changeSubmitButton($(this));"/> <Strong>Don't Submit Now</Strong><br/>
+			<input id="shareTemplate" name="shareTemplate" type="checkbox"  disabled="disabled"/> <Strong>Share Template</Strong>
+			</div>
 			<aui:button-row>
-			<aui:button type="submit" value="Submit"/>
-			<portlet:actionURL var="goHome">
-				<portlet:param name="myaction" value="goHome"></portlet:param>
-				<portlet:param name="settedPath" value="${jdl.path }"></portlet:param>
-			</portlet:actionURL>
-			<aui:button type="button" value="Back" onClick="${goHome }"/>
+			<aui:button id="submitButton" type="submit" value="Submit"/>
+			<aui:button type="button" value="Job List" onClick="${goHome }"/>
 			</aui:button-row>
 		</aui:form>
+		</div>
 	</div>
 </div>
 
@@ -421,6 +734,12 @@
 		$("#outputSandboxDiv").show();
 		$('#outremove').show(); 
 		$('#outadd').hide();
+	}
+	
+	if("${viewTemplate}"=='true'){
+		$('.templates').show();
+	}else{
+		$('.jdlDiv').show();
 	}
 	
 </script>
