@@ -68,6 +68,18 @@
 	margin-right: 10px;
 }
 
+.status{
+	margin-top: 7px;
+}
+
+.minorStatus{
+	color: grey;
+}
+
+.first{
+	text-align: center !important ;
+}
+
 </style>
 
 <div id="containerDirac">
@@ -177,10 +189,10 @@
 							</portlet:renderURL>
 					<a href="#" onclick="$(this).modal3({width:600, height:450, message:true, redirect:'${homeUrl}', src: '${getJdlURLonName}'}).open();">${job.jobName }</a>
 					</liferay-ui:search-container-column-text>
-					<liferay-ui:search-container-column-text name="Submission Time"
-						property="submissionTime" />
-					<liferay-ui:search-container-column-text name="Last Sign of Life"
-						property="heartBeatTime" />	
+					<liferay-ui:search-container-column-text name="Submitted"
+						>${job.submissionTime } </liferay-ui:search-container-column-text>	
+					<liferay-ui:search-container-column-text name="Site"
+						property="site" />
 							
 						
 					<liferay-ui:search-container-column-text name="Status">
@@ -204,7 +216,7 @@
 								<div id="runningStatus" class="status"></div>
 							</c:otherwise>
 						</c:choose>
-						<div id="status value">${job.status } - ${job.minorStatus }</div>
+						<div id="status value"><strong>${job.status }</strong> at ${job.heartBeatTime } <br/> <span class="minorStatus">${job.minorStatus }</span></div>
 						<div id="reset"></div>
 					</liferay-ui:search-container-column-text>
 						

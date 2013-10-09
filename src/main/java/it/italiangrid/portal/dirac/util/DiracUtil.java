@@ -42,7 +42,7 @@ public class DiracUtil {
 		
 		myJdl.copyJob(null, userId, true, path);
 		
-		myJdl.setJobName("Portal_Job_Copy_of_Template_" + myJdl.getJobName());
+		myJdl.setJobName("Job_Template_" + myJdl.getJobName());
 		
 		return myJdl;
 	}
@@ -92,7 +92,7 @@ public class DiracUtil {
     }
 	
 	@SuppressWarnings("resource")
-	public static void zip(File directory, File zipfile) throws IOException {
+	public static void zip(File directory, File zipfile) throws Exception {
 		URI base = directory.toURI();
 		Deque<File> queue = new LinkedList<File>();
 		queue.push(directory);
@@ -116,7 +116,9 @@ public class DiracUtil {
 					}
 				}
 			}
-		} finally {
+		}catch(Exception e){ 
+			res.close();
+		}finally {
 			res.close();
 		}
 	}

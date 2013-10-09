@@ -72,6 +72,10 @@
 		}else{
 			$('.templates').hide('slow');
 			$('.jdlDiv').show('slow');
+			$("#saveAsTemplate").attr('checked', true);
+			$("#saveOnly").attr('checked', true);
+			changeCheckbox($('#saveAsTemplate'), 'shareTemplate', 'saveOnly');
+			changeSubmitButton($('#saveOnly'))
 		}
 	}
 	
@@ -83,7 +87,7 @@
 		}
 	}
 	
-var list = new Array();
+	var list = new Array();
 	
 	/**
 	 * Function that show the delete button if some virtual machine are selected, or hide the button if none.
@@ -172,6 +176,7 @@ var list = new Array();
 #template_table_paginate{
 	float: right;
 	margin-right: 5px;
+	margin-bottom: 10px;
 }
 
 #template_table_paginate a{
@@ -189,6 +194,23 @@ var list = new Array();
 }
 .jdlDiv{
 	display: none;
+}
+
+.aui-button-content{
+	margin: 10px 10px 0 0;
+}
+.ownerYes{
+	color: green;
+}
+.ownerNo{
+	color: red;
+}
+.center{
+	text-align: center;
+}
+.first{
+	text-align: center !important;
+	width: 40px;
 }
 </style>
 
@@ -239,9 +261,6 @@ var list = new Array();
 			<div class="jdlDiv">
 				<aui:button type="button" value="Use Template" onClick="changeTemplate();"/>
 			</div>
-			<div class="templates">
-				<aui:button type="button" value="Submit New Job" onClick="changeTemplate();"/>
-			</div>
 			</aui:button-row>
 			</aui:form>
 		</c:if>
@@ -256,10 +275,10 @@ var list = new Array();
 				<div class="operationButton" style="display: none;">
 					<aui:button-row>
 						
-					<aui:button type="submit" value="Delete Templates"
+					<aui:button type="submit" value="Delete"
 						onClick="return confirm('Are you sure you want to delete these tempaltes?');" />
-					<aui:button type="button" value="Share templates" onClick="$('#operation').val('share'); $('#multipleTemplateForm').submit();"/>
-					<aui:button type="button" value="Privatize templates" onClick="$('#operation').val('unshare'); $('#multipleTemplateForm').submit();"/>
+					<aui:button type="button" value="Share" onClick="$('#operation').val('share'); $('#multipleTemplateForm').submit();"/>
+					<aui:button type="button" value="Private" onClick="$('#operation').val('unshare'); $('#multipleTemplateForm').submit();"/>
 					</aui:button-row>
 				</div>
 			
@@ -272,15 +291,15 @@ var list = new Array();
 						<tr  class="portlet-section-header results-header">
 							<th class="col-1 first sorting">Sel <input type='checkbox' onclick='setAll($(this));'/></th>
 							<th class="col-2 sorting">Name</th>
-							<th class="col-3 sorting">Type</th>
-							<th class="col-4 sorting">Owner</th>
+							<th class="col-3 sorting center">Type</th>
+							<th class="col-4 sorting center">Owner</th>
 							<th class="col-5 last sorting">Action</th>
 						</tr>
 					</thead>
 					<tbody>
 						<c:forEach var="template" items="${templateList }" > 
 							<tr class="results-row portlet-section-alternate-hover effect">
-								<td>
+								<td class="center">
 									<c:if test="${template.owner == user.userId}">
 										<input class="operationCheckbox" name="templateList" type="checkbox"
 											value="${template.path }"
@@ -288,8 +307,15 @@ var list = new Array();
 									</c:if>
 								</td>
 								<td>${template.name }</td>
-								<td>${template.type }</td>
-								<td>${template.owner }</td>
+								<td  class="center">${template.type }</td>
+								<td  class="center">
+									<c:if test="${template.owner == user.userId}">
+										<span class="ownerYes">Yes</span>
+									</c:if>
+									<c:if test="${template.owner != user.userId}">
+										<span class="ownerNo">No</span>
+									</c:if>
+								</td>
 								<td style="text-align: right;">
 									<liferay-ui:icon-menu>
 								
@@ -329,21 +355,23 @@ var list = new Array();
 				
 				</table>
 				
-				<div class="operationButton" style="display: none;">
-				<aui:button-row>
-					
-					<aui:button type="submit" value="Delete Templates"
-						onClick="return confirm('Are you sure you want to delete these tempaltes?');" />
-					<aui:button type="button" value="Share templates" onClick="$('#operation').val('share'); $('#multipleJobForm').submit();"/>
-					<aui:button type="button" value="Privatize templates" onClick="$('#operation').val('unshare'); $('#multipleJobForm').submit();"/>
-				</aui:button-row>
-			</div>
-				
+				<c:if test="${fn:length(templateList) > 15 }">
+					<div class="operationButton" style="display: none;">
+						<aui:button-row>
+							
+							<aui:button type="submit" value="Delete"
+								onClick="return confirm('Are you sure you want to delete these tempaltes?');" />
+							<aui:button type="button" value="Share" onClick="$('#operation').val('share'); $('#multipleJobForm').submit();"/>
+							<aui:button type="button" value="Private" onClick="$('#operation').val('unshare'); $('#multipleJobForm').submit();"/>
+						</aui:button-row>
+					</div>
+				</c:if>
 			</form>
 			
 			<aui:form name="back" action="${goHome }">
 			<aui:button-row>
-			<aui:button type="submit" value="Back"/>
+			<aui:button type="button" value="Create New Template" onClick="changeTemplate();"/>
+			<aui:button type="submit" value="Job List"/>
 			</aui:button-row>
 			</aui:form>
 		</div>	
@@ -588,6 +616,7 @@ var list = new Array();
 					<a href="#inputSanboxDiv" onclick="addFile();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Input Sandbox</a>
 					</div>	
 					<hr/>
+					<div style="display: none;">
 					<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> MPI </label>
 					<div>
 					<a id="cpuadd" href="#cpuNumberDiv" onclick="$('#cpuNumberDiv').show(); setTimeout( function() { $('#cpuNumberDiv input').focus(); }, 200 ); $('#cpuremove').show(); $('#cpuadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> CPU Number</a>
@@ -606,6 +635,7 @@ var list = new Array();
 					<a id="smpremove" style="display: none;" href="#smpGranularityDiv" onclick="$('#smpGranularityDiv').hide(); $('#smpadd').show(); $('#smpremove').hide(); $('#smpGranularityDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> SMP Granularity</a>
 					</div>
 					<hr/>
+					</div>
 					<label id="aui_3_4_0_1_1045" class="aui-field-label" for="_IGIPortalDIRAC_WAR_IGIPortalDIRAC001_INSTANCE_mpwer7lWR8f9_inputSandbox"> PARAMETRIC </label>
 					<div>
 					<a id="parametersadd" href="#parametersDiv" onclick="$('#parametersDiv').show(); $('#parametersremove').show(); $('#parametersadd').hide(); setTimeout( function() { $('#parametersDiv input').focus(); }, 200 );"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Parameters</a>
@@ -632,14 +662,14 @@ var list = new Array();
 				</aui:fieldset>	
 			</div>
 			<div id="reset"></div>
-			<aui:input name="saveAsTemplate" type="checkbox" label="Save As Template" onClick="changeCheckbox($(this), 'shareTemplate', 'saveOnly');"/>
-			<div id="checks" style="margin: 0 0 15px 15px; display: none;">
+			<input id="saveAsTemplate" name="saveAsTemplate" type="checkbox" onClick="changeCheckbox($(this), 'shareTemplate', 'saveOnly');"/> <Strong>Save As Template</Strong><br/>
+			<div id="checks" style="margin: 0 0 0 15px; display: none;">
 			<input id="saveOnly" name="saveOnly" type="checkbox"  disabled="disabled" onClick="changeSubmitButton($(this));"/> <Strong>Don't Submit Now</Strong><br/>
 			<input id="shareTemplate" name="shareTemplate" type="checkbox"  disabled="disabled"/> <Strong>Share Template</Strong>
 			</div>
 			<aui:button-row>
 			<aui:button id="submitButton" type="submit" value="Submit"/>
-			<aui:button type="button" value="Back" onClick="${goHome }"/>
+			<aui:button type="button" value="Job List" onClick="${goHome }"/>
 			</aui:button-row>
 		</aui:form>
 		</div>

@@ -208,6 +208,8 @@ public class SubmitJobControllerAction {
 					}
 				}
 				jdl.setOutputSandbox(outputSandbox);
+				
+				log.info("OutputSandbox: " + jdl.getOutputSandbox());
 		        
 				if(needsWrapper){
 					
@@ -281,13 +283,13 @@ public class SubmitJobControllerAction {
 				/*
 				 * Manage Template
 				 */
-				boolean saveAsTemplate = Boolean.parseBoolean(uploadRequest.getParameter("saveAsTemplate"));
+				String saveAsTemplate = uploadRequest.getParameter("saveAsTemplate");
 				String shareTemplate = uploadRequest.getParameter("shareTemplate");
 				
 				log.info("saveAsTempalte: " + saveAsTemplate);				
 				log.info("shareTemplate: " + shareTemplate);
 				
-				if(saveAsTemplate){
+				if(saveAsTemplate!=null){
 					String copyPath;
 					if(shareTemplate==null){
 						/*
@@ -315,7 +317,7 @@ public class SubmitJobControllerAction {
 				
 				
 			}
-			boolean saveAsTemplate = Boolean.parseBoolean(uploadRequest.getParameter("saveAsTemplate"));
+			String saveAsTemplate = uploadRequest.getParameter("saveAsTemplate");
 			String saveOnly = uploadRequest.getParameter("saveOnly");
 			String shareTemplate = uploadRequest.getParameter("shareTemplate");
 			
@@ -325,7 +327,7 @@ public class SubmitJobControllerAction {
 			}else{
 				SessionMessages.add(request, "submit-successufully");
 			}
-			if(saveAsTemplate){
+			if(saveAsTemplate!=null){
 				SessionMessages.add(request, "save-successufully");
 			}
 			if(shareTemplate!=null){

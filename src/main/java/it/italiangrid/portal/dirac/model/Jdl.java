@@ -60,7 +60,7 @@ public class Jdl {
 		"inputSandbox", "outputSandboxRequest", "outputSandbox", "outputSandboxDestUri", "stdOutput", "stdError",
 		"inputData", "outputSE", "outputData", "outputPath", "parameters", "parameterStart",
 		"parameterStep", "cpuNumber", "hostNumber", "wholeNodes", "smpGranularity", "vo", "requirements", "myProxyServer", "path", "site"});
-	private List<String> parameterJDLNames = Arrays.asList(new String[]{ "jobName", "Executable", "Arguments",
+	private List<String> parameterJDLNames = Arrays.asList(new String[]{ "JobName", "Executable", "Arguments",
 			"InputSandbox", "OutputSandboxRequest", "OutputSandbox", "OutputSandboxDestUri", "StdOutput", "StdError",
 			"InputData", "OutputSE", "OutputData", "OutputPath", "Parameters", "ParameterStart",
 			"ParameterStep", "CPUNumber", "HostNumber", "WholeNodes", "SMPGranularity", "VirtualOrganization", "Requirements", "MyProxyServer", "path", "Site"});
@@ -503,7 +503,7 @@ public class Jdl {
 	 */
 	@Override
 	public String toString() {
-		String string = "";
+		String string = "\n";
 		
 //		if (parameters != null) {
 //			string += "JobType = \"Parametric\";\n";
@@ -534,7 +534,7 @@ public class Jdl {
 				string += "\"" + s + "\",";
 			}
 
-			string = string.substring(0, string.length() - 2);
+			string = string.substring(0, string.length() - 1);
 
 			string += "};\n";
 		}
@@ -544,7 +544,7 @@ public class Jdl {
 				string += "\"" + s + "\",";
 			}
 
-			string = string.substring(0, string.length() - 2);
+			string = string.substring(0, string.length() - 1);
 
 			string += "};\n";
 		}
@@ -554,7 +554,7 @@ public class Jdl {
 				string += "\"" + s + "\", ";
 			}
 
-			string = string.substring(0, string.length() - 2);
+			string = string.substring(0, string.length() - 1);
 
 			string += "};\n";
 		}

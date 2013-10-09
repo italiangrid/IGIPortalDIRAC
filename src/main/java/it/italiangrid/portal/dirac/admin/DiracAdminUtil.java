@@ -270,15 +270,18 @@ public class DiracAdminUtil {
 				throw new DiracException("submit-error");
 			if(line.contains("No value for key"))
 				throw new DiracException("submit-error"); 
-			if(list != null){
-			if(line.contains("JobID = ")){
-				String[] ids = line.replace("JobID = ", "").replace("[", "").replace("]", "").replaceAll(" ", "").split(",");
-				for (String string : ids) {
-					list.add(string);
-				}
-			}else{
-				list.add(line);
+			if(line.contains("No Output sandbox registered for job")){
+				throw new DiracException("no-sandbox-error");
 			}
+			if(list != null){
+				if(line.contains("JobID = ")){
+					String[] ids = line.replace("JobID = ", "").replace("[", "").replace("]", "").replaceAll(" ", "").split(",");
+					for (String string : ids) {
+						list.add(string);
+					}
+				}else{
+					list.add(line);
+				}
 			}
 		}
 		output.close();

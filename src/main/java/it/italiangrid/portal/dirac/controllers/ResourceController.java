@@ -47,9 +47,9 @@ public class ResourceController {
 				
 				String userPath = System.getProperty("java.io.tmpdir") + "/users/"+user.getUserId();
 				
-				File storePath = new File(userPath + "/DIRAC/Outputs/" + jobsService.findById(jobId).getJobName());
+				File storePath = new File(userPath + "/DIRAC/Outputs/" + job.getJobName() + "_" + job.getJobId());
 				
-				File zipFile = new File(userPath + "/DIRAC/Outputs/" + jobsService.findById(jobId).getJobName() + ".zip");
+				File zipFile = new File(userPath + "/DIRAC/Outputs/" + job.getJobName() + "_" + job.getJobId() + ".zip");
 				
 				storePath.mkdirs();
 				
@@ -63,7 +63,7 @@ public class ResourceController {
 				DiracUtil.zip(sourcePath, zipFile);
 				
 				response.setContentType("application/zip");
-				response.setProperty("Content-Disposition", "attachment; filename=\"" + job.getJobName() + ".zip\"");
+				response.setProperty("Content-Disposition", "attachment; filename=\"" + job.getJobName() + "_" + job.getJobId() + ".zip\"");
 				
 				
 				FileInputStream fileIn = new FileInputStream(zipFile);
