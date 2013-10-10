@@ -159,3 +159,104 @@ margin: 10px;
 .moreHelp{
 	display: none;
 }
+
+.operationButton{
+	display: none; 
+	border: 1px solid DarkBlue;
+	background-color: LightBlue; 
+	margin-bottom: 10px; 
+	padding-left: 10px;  
+	margin-top: 10px;
+}
+
+#buttonBar{
+	margin-bottom: 10px;
+}
+
+.status{
+	margin-top: 7px;
+}
+
+.minorStatus{
+	color: grey;
+}
+
+.first{
+	text-align: center !important ;
+	width: 40px;
+}
+
+.templates{
+	display: none; 
+}
+
+.tempaltesCss{
+	margin: 10px;
+}
+
+#template_table_wrapper{
+	width: 100%;
+}
+
+.sorting_disabled{
+	display: none;
+}
+
+#template_table{
+	background-color: white;
+}
+
+#template_table_length{
+	float: left;
+	margin-left: 5px;
+}
+
+#template_table_filter{
+	float: right;
+	margin-right: 5px;
+}
+
+#template_table_info{
+	float: left;
+	margin-left: 5px;
+}
+
+#template_table_paginate{
+	float: right;
+	margin-right: 5px;
+	margin-bottom: 10px;
+}
+
+#template_table_paginate a{
+	padding-left: 5px;
+}
+	
+.even {
+	background-color: #F5F8FB;
+}
+
+.effect:hover td{
+	background:  #D3E8F1;
+	border: 1px solid #D3E8F1;
+	border-bottom-color: #D7D7D7;
+}
+
+.jdlDiv{
+	display: none;
+}
+
+.aui-button-content{
+	margin: 10px 10px 0 0;
+}
+
+.ownerYes{
+	color: green;
+}
+
+.ownerNo{
+	color: red;
+}
+
+.center{
+	text-align: center;
+}

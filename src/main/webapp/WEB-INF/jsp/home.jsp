@@ -26,9 +26,9 @@
 			list = newlist;
 	
 		if (list.length == 0) {
-			$(".deleteButton").hide("slow");
+			$(".operationButton").hide("slow");
 		} else {
-			$(".deleteButton").show("slow");
+			$(".operationButton").show("slow");
 		}
 	}
 	
@@ -36,10 +36,10 @@
 		var val = element.attr('checked');
 		if(val == "checked"){
 			$(".deleteCheckbox").attr('checked', true);
-			$(".deleteButton").show("slow");
+			$(".operationButton").show("slow");
 		}else{
 			$(".deleteCheckbox").attr('checked', false);
-			$(".deleteButton").hide("slow");
+			$(".operationButton").hide("slow");
 		}
 		
 	}
@@ -57,30 +57,6 @@
 	
 	
 </script>
-
-<style type="text/css">
-
-#buttonBar{
-	margin-bottom: 10px;
-}
-
-.aui-button-content{
-	margin-right: 10px;
-}
-
-.status{
-	margin-top: 7px;
-}
-
-.minorStatus{
-	color: grey;
-}
-
-.first{
-	text-align: center !important ;
-}
-
-</style>
 
 <div id="containerDirac">
 	<div id="presentationDirac">My Jobs</div>
@@ -140,20 +116,25 @@
 		<jsp:useBean id="jobs"
 				type="java.util.List<it.italiangrid.portal.dirac.db.domain.Jobs>"
 				scope="request" />
-		<portlet:actionURL var="deleteMultipleJob">
-			<portlet:param name="myaction" value="deleteMultipleJob"/>
-		</portlet:actionURL>	
-		
-		<form id="multipleJobForm" name="delMultForm" action="${deleteMultipleJob}" method="POST">
+		<portlet:actionURL var="operationOnMultipleJobUrl">
+			<portlet:param name="myaction" value="operationOnMultipleJob"/>
+		</portlet:actionURL>
+		<portlet:resourceURL var="getMultipleOutputZipFileURL" escapeXml="false" id="getMultipleOutputZipFile"/>	
+
+		<form id="multipleJobForm" name="delMultForm" action="${operationOnMultipleJobUrl}" method="POST">
 			<input id="operation" type="hidden" name="operation" value="delete"/>
 			
-			<div class="deleteButton" style="display: none;">
+			<div class="operationButton">
+			
+				
 				<aui:button-row>
 					
 					<aui:button type="submit" value="Delete Jobs"
 						onClick="return confirm('Are you sure you want to delete these jobs?');" />
 					<aui:button type="button" value="Reschedule Jobs" onClick="$('#operation').val('reschedule'); $('#multipleJobForm').submit();"/>
+					<aui:button type="button" value="Get Outputs" onClick="$('#multipleJobForm').get(0).setAttribute('action', '${getMultipleOutputZipFileURL }'); $('#multipleJobForm').submit();"/>
 				</aui:button-row>
+				
 			</div>
 			
 			<liferay-ui:search-container
@@ -176,7 +157,7 @@
 					keyProperty="jobId" modelVar="job">
 					
 					<liferay-ui:search-container-column-text name="Sel <input type='checkbox' onclick='setAll($(this));'/>">
-						<input class="deleteCheckbox" name="jobToDel" type="checkbox"
+						<input class="deleteCheckbox" name="jobs" type="checkbox"
 							value="${job.jobId }"
 							onchange="viewOrHideDeleteButton('${job.jobId }');"></input>
 					</liferay-ui:search-container-column-text>
@@ -260,13 +241,16 @@
 				</liferay-ui:search-container-row>
 				<liferay-ui:search-iterator />
 			</liferay-ui:search-container>
-			<div class="deleteButton" style="display: none;">
-				<aui:button-row>
-					<aui:button type="submit" value="Delete Jobs"
-						onClick="return confirm('Are you sure you want to delete these jobs?');" />
-					<aui:button type="button" value="Reschedule Jobs" onClick="$('#operation').val('reschedule'); $('#multipleJobForm').submit();"/>
-				</aui:button-row>
-			</div>
+			<c:if test="${fn:length(jobs) > 15 }">
+				<div class="operationButton">
+					<aui:button-row>
+						<aui:button type="submit" value="Delete Jobs"
+							onClick="return confirm('Are you sure you want to delete these jobs?');" />
+						<aui:button type="button" value="Reschedule Jobs" onClick="$('#operation').val('reschedule'); $('#multipleJobForm').submit();"/>
+						<aui:button type="button" value="Get Outputs" onClick="$('#multipleJobForm').get(0).setAttribute('action', '${getMultipleOutputZipFileURL }'); $('#multipleJobForm').submit();"/>
+					</aui:button-row>
+				</div>
+			</c:if>
 		</form>
 	</div>
 </div>

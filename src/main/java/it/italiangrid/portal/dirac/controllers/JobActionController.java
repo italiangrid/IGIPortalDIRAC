@@ -91,8 +91,8 @@ public class JobActionController {
 
 	}
 	
-	@ActionMapping(params = "myaction=deleteMultipleJob")
-	public void getDeleteMultipleJob(@RequestParam int[] jobToDel, ActionRequest request){
+	@ActionMapping(params = "myaction=operationOnMultipleJob")
+	public void operationOnMultipleJob(@RequestParam int[] jobs, ActionRequest request){
 		
 		try {
 			User user = PortalUtil.getUser(request);
@@ -103,7 +103,7 @@ public class JobActionController {
 				String operation = request.getParameter("operation");
 				log.info("Operation: " + operation);
 				
-				for(int jobId : jobToDel){
+				for(int jobId : jobs){
 					switch (operations.indexOf(operation)) {
 					case 0: /* delete */
 						log.info("Delete job: " + jobId);

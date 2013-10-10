@@ -181,8 +181,8 @@ public class DiracUtil {
 	public static void mv(File source, String destination) {
 		
 		File destFolder = new File(destination);
-		
-		destFolder.mkdir();
+		if(!destFolder.exists())
+			destFolder.mkdir();
 		
 		if(source.isDirectory()) {
 		    File[] content = source.listFiles();
