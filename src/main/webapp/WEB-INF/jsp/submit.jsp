@@ -359,9 +359,9 @@
 							<a href="#addFile" onclick="$('#parametersDiv').hide(); $('#parametersadd').show();  $('#parametersremove').hide(); $('#parameterStartDiv').hide(); $('#parameterStartadd').show(); $('#parameterStartremove').hide(); $('#parameterStepDiv').hide(); $('#parameterStepadd').show(); $('#parameterStepremove').hide(); $('#parametersDiv input').val(''); $('#parameterStartDiv input').val(''); $('#parameterStepDiv input').val('');"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /></a>
 						</div>
 						<div style="clear: both;"></div>
-						<div class="help" style="float: left; width: 80%;">
+						<div class="help" style="float: left; width: 100%;">
 							<strong>Help:</strong> Parameters can be a list or a number. <a href="#moreHelpParameters" onclick="changeMoreHelpVisibility('moreHelpParameters', $(this));">More</a>
-							<div id="moreHelpParameters" class="moreHelp">
+							<div id="moreHelpParameters" class="moreHelp" style="width: 80%;">
 								<ul>
 									<li>A list of strings or numbers separate by ";". eg. 1;2;3</li>
 									<li>An integer (eg. 100), in this case the attributes <a href="#parameterStartDiv" onclick="$('#parameterStartDiv').show(); setTimeout( function() { $('#parameterStartDiv input').focus(); }, 200 ); $('#parameterStartremove').show(); $('#parameterStartadd').hide();">Parameter Start</a> (eg. 20) and <a href="#parameterStartDiv" onclick="$('#parameterStepDiv').show(); setTimeout( function() { $('#parameterStepDiv input').focus(); }, 200 ); $('#parameterStepremove').show(); $('#parameterStepadd').hide();">Parameter Step</a> (eg. 2) must be defined as integers to create the list of job parameters.</li>
