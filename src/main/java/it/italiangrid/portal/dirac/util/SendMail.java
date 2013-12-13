@@ -28,6 +28,7 @@ public class SendMail {
 	private String to;
 	private String subject;
 	private String text;
+	private boolean isHtml;
  
 	/**
 	 * Contructor.
@@ -37,11 +38,12 @@ public class SendMail {
 	 * @param subject - subject
 	 * @param text - content
 	 */
-	public SendMail(String from, String to, String subject, String text){
+	public SendMail(String from, String to, String subject, String text, boolean isHtml){
 		this.from = from;
 		this.to = to;
 		this.subject = subject;
 		this.text = text;
+		this.isHtml = isHtml;
 	}
  
 	/**
@@ -69,7 +71,11 @@ public class SendMail {
 			simpleMessage.setFrom(fromAddress);
 			simpleMessage.setRecipient(RecipientType.TO, toAddress);
 			simpleMessage.setSubject(subject);
-			simpleMessage.setText(text);
+			
+			if(isHtml)
+				simpleMessage.setContent(text, "text/html; charset=utf-8");
+			else
+				simpleMessage.setText(text);
  
 			Transport.send(simpleMessage);
 		} catch (MessagingException e) {

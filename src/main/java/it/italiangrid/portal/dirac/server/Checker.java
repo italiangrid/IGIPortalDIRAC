@@ -4,9 +4,12 @@ import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.model.Notify;
 import it.italiangrid.portal.dirac.util.DiracConfig;
 import it.italiangrid.portal.dirac.util.SendMail;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -200,16 +203,29 @@ public class Checker implements Runnable{
 		String mailContent = "";
 		String jobIDs = "";
 		String jobStatus = "";
-		
+		boolean isHtml = true;
 		if(status.size()>1){
 			
 			mailSubject = DiracConfig.getProperties("Dirac.properties", "dirac.checker.subject.multi");
-			mailContent = DiracConfig.getProperties("Dirac.properties", "dirac.checker.mail.multi");
+			
+			try {
+				mailContent = readFile(DiracConfig.getProperties("Dirac.properties", "dirac.checker.mail.multi.template"));
+			} catch (IOException e) {
+				isHtml = false;
+				mailContent = DiracConfig.getProperties("Dirac.properties", "dirac.checker.mail.multi");
+			}
+			
+			
 			
 		}else{
 		
 			mailSubject = DiracConfig.getProperties("Dirac.properties", "dirac.checker.subject.single");
-			mailContent = DiracConfig.getProperties("Dirac.properties", "dirac.checker.mail.single");
+			try {
+				mailContent = readFile(DiracConfig.getProperties("Dirac.properties", "dirac.checker.mail.single.template"));
+			} catch (IOException e) {
+				isHtml = false;
+				mailContent = DiracConfig.getProperties("Dirac.properties", "dirac.checker.mail.single");
+			}
 		
 		}
 		
@@ -224,8 +240,9 @@ public class Checker implements Runnable{
 		mailSubject = mailSubject.replace("##JOBIDS##", jobIDs);
 		mailContent = mailContent.replace("##USER##", n.getUser());
 		mailContent = mailContent.replace("##STATUS##", jobStatus);
+		mailContent = mailContent.replace("##HOST##", DiracConfig.getProperties("Dirac.properties", "portal.home"));
 		
-		SendMail sm = new SendMail(from, n.getEmail(), mailSubject, mailContent);
+		SendMail sm = new SendMail(from, n.getEmail(), mailSubject, mailContent, isHtml);
 		sm.send();
 		
 	}
@@ -300,6 +317,24 @@ public class Checker implements Runnable{
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
+	}
+	
+	private String readFile(String fileName) throws IOException {
+		log.info("Path mail: " + Checker.class.getClassLoader().getResource("").getPath() + fileName);
+	    BufferedReader br = new BufferedReader(new FileReader(Checker.class.getClassLoader().getResource("").getPath() + fileName));
+	    try {
+	        StringBuilder sb = new StringBuilder();
+	        String line = br.readLine();
+
+	        while (line != null) {
+	            sb.append(line);
+	            sb.append("\n");
+	            line = br.readLine();
+	        }
+	        return sb.toString();
+	    } finally {
+	        br.close();
+	    }
 	}
 
 }
