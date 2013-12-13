@@ -193,7 +193,11 @@ public class SubmitJobControllerAction {
 							        jdl.setParameter(parameter, value);
 			            		}
 			            	}else{
-						        jdl.setParameter(parameter, value);
+//			            		if(parameter.equals("arguments")){
+//			            			value = value.replaceAll("(\\r|\\n)", " ");
+//			            		}
+			            		jdl.setParameter(parameter, value);
+			            		
 			            	}
 		            	}
 		            }
@@ -208,6 +212,8 @@ public class SubmitJobControllerAction {
 					}
 				}
 				jdl.setOutputSandbox(outputSandbox);
+				
+				jdl.setArguments(jdl.getArguments().replaceAll("(\\r|\\n)", " "));
 				
 				log.info("OutputSandbox: " + jdl.getOutputSandbox());
 		        
@@ -240,7 +246,7 @@ public class SubmitJobControllerAction {
 		        	jdl.setInputSandbox(inputSandbox);
 		        }
 		 
-		        log.info("Jdl:\n"+jdl);
+		        log.info("Final Jdl:\n"+jdl);
 		        
 		        /*
 				 * Save jdl on file

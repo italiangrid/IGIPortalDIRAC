@@ -306,7 +306,7 @@
 						<aui:input type="text" id="executable" label="Executable" name="executable" value="${jdl.executable }"/>
 					</div>
 					<div id="argumentsDiv">
-						<aui:input type="text" label="Arguments" name="arguments" value="${jdl.arguments }"/>
+						<aui:input type="textarea" cols="80" rows ="5" label="Arguments" name="arguments" value="${jdl.arguments }"/>
 					</div>
 					<c:if test="${fn:length(vos)>1 }">
 					<label for="selectVO"><strong>VO</strong></label><br/>
