@@ -1,5 +1,7 @@
 <%@ include file="/WEB-INF/jsp/init.jsp"%>
 
+<portlet:renderURL var="url"/>
+
 <script type="text/javascript">
 
 	var list = new Array();
@@ -48,7 +50,7 @@
 		
 		if(${isAllJobsTerminate}==false){
 			setTimeout(function(){
-				location.href='${reloadPage}';
+				location.href='${fn:split(url,'?')[0]}';
 		    }, 60000);
 		}
 		
@@ -92,7 +94,7 @@
 			<portlet:param name="myaction" value="showSubmitJob" />
 			<portlet:param name="viewTemplate" value="true" />
 		</portlet:renderURL>
-		
+
 		<div id="buttonBar">
 		<aui:fieldset >
 		<aui:column columnWidth="50">
@@ -107,7 +109,7 @@
 		<aui:column columnWidth="50">
 			<aui:form id="refresh" name="refresh">
 				<aui:button-row >
-					<aui:button style="float: right;" type="button" value="Refresh" onClick="location.href='${reloadPage}';"/>
+					<aui:button style="float: right;" type="button" value="Refresh" onClick="location.href='${fn:split(url,'?')[0]}';"/>
 				</aui:button-row>
 			</aui:form>
 		</aui:column>
