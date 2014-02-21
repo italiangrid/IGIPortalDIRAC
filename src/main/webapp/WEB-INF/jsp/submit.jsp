@@ -366,7 +366,7 @@
 									<li>A list of strings or numbers separate by ";". eg. 1;2;3</li>
 									<li>An integer (eg. 100), in this case the attributes <a href="#parameterStartDiv" onclick="$('#parameterStartDiv').show(); setTimeout( function() { $('#parameterStartDiv input').focus(); }, 200 ); $('#parameterStartremove').show(); $('#parameterStartadd').hide();">Parameter Start</a> (eg. 20) and <a href="#parameterStartDiv" onclick="$('#parameterStepDiv').show(); setTimeout( function() { $('#parameterStepDiv input').focus(); }, 200 ); $('#parameterStepremove').show(); $('#parameterStepadd').hide();">Parameter Step</a> (eg. 2) must be defined as integers to create the list of job parameters.</li>
 								</ul>
-								The other JDL attributes can contain "%s" placeholder. For each generated job this placeholder will be replaced by one of the values in the Parameters list. (eg. Job Name = "%s_parametric";) </br>
+								The other JDL attributes can contain "%s" placeholder. For each generated job this placeholder will be replaced by one of the values in the Parameters list. (eg. Job Name = "%s_parametric";) <br/>
 								<a href="https://github.com/DIRACGrid/DIRAC/wiki/JobManagementAdvanced" target="_blank">Dirac Wiki</a>
 							</div>
 						</div>
@@ -453,7 +453,7 @@
 						</div>
 						<div style="clear: both;"></div>
 						<div class="help">
-							<strong>Example:</strong> (other.GlueHostMainMemoryRAMSize>1024)&&(GlueCEStateFreeCPUs>2)</br>
+							<strong>Example:</strong> (other.GlueHostMainMemoryRAMSize>1024)&&(GlueCEStateFreeCPUs>2)<br/>
 							Do not specify a target CE or queue, but use the <a href="#siteDiv" onclick="$('#sitesDiv').show(); setTimeout( function() { $('#sitesDiv input').focus(); }, 200 ); $('#sitesremove').show(); $('#sitesadd').hide();">Site</a> field.
 						</div>
 					</div>
