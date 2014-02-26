@@ -37,10 +37,6 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-
-
-
-
 	</repositories>
 	<dependencies>
 		<dependency>

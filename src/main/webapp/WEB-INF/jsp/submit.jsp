@@ -2,7 +2,16 @@
 
 <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"></script>
 
+
+	
+
 <script type="text/javascript">
+
+	var map = {};
+	<c:forEach var="vo" items="${vos }">
+		map['${vo.vo}'] = '${voListMatch[vo.vo]}';
+	</c:forEach>
+	
 	var count = 0;
 	function deleteFile(divName){
 		$("#"+divName).remove();
@@ -127,6 +136,17 @@
 			$(".operationButton").hide("slow");
 		}
 		
+	}
+	
+	function changeSites(){
+		$("#selectSite").empty();
+		
+		var vo = $("#selectVO").val();
+		var list = map[vo].split(';');
+		
+		list.forEach(function(entry) {
+		    $("#selectSite").append("<option value=\"LCG." + entry + ".it\">" + entry + "</option>");
+		});
 	}
 	
 	$(document).ready(function() {
@@ -310,7 +330,7 @@
 					</div>
 					<c:if test="${fn:length(vos)>1 }">
 					<label for="selectVO"><strong>VO</strong></label><br/>
-					<select id="selectVO" name="vo">
+					<select id="selectVO" name="vo" onchange="changeSites();">
 					
 						<c:forEach var="vo" items="${vos }">
 							<c:if test="${vo.vo == defaultVo }">
@@ -464,12 +484,13 @@
 							<label for="selectSite"><strong>Site</strong></label><br/>
 							<select id="selectSite" name="site">
 						
-							<c:forEach var="site" items="${sites }">
+							<c:set var="sitesList" value="${fn:split(voListMatch[defaultVo], ';') }"/>
+							<c:forEach var="site" items="${sitesList }">
 								<c:if test="${site == jdl.site }">
-									<option selected="true" value="${site }">${site }</option>
+									<option selected="true" value="LCG.${site }.it">${site }</option>
 								</c:if>
 								<c:if test="${site != jdl.site }">
-									<option value="${site }">${site }</option>
+									<option value="LCG.${site }.it">${site }</option>
 								</c:if>
 							</c:forEach>
 						

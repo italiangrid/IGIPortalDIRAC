@@ -21,4 +21,7 @@
 	<listener>
 		<listener-class>it.italiangrid.portal.dirac.server.CheckerService</listener-class>
 	</listener>
+	<listener>
+		<listener-class>it.italiangrid.portal.dirac.server.VoListMatchService</listener-class>
+	</listener>
 </web-app>

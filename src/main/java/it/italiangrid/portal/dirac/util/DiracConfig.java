@@ -13,6 +13,34 @@ public class DiracConfig {
 	
 	private static final Logger log = Logger.getLogger(DiracConfig.class);
 	
+	private Properties properties;
+	
+	public DiracConfig(String file) throws DiracException {
+		String contextPath = DiracConfig.class.getClassLoader()
+				.getResource("").getPath();
+		File test = new File(contextPath + "/content/" + file);
+		log.info("File: " + test.getAbsolutePath());
+		if (test.exists()) {
+			log.info("ESISTE!!");
+			try {
+				FileInputStream inStream = new FileInputStream(contextPath
+						+ "/content/" + file);
+
+				this.properties = new Properties();
+
+				this.properties.load(inStream);
+
+				inStream.close();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new DiracException("properties-file-not-found");
+			}
+		}else{
+			throw new DiracException("properties-file-not-found");
+		}
+	}
+
 	public static String getProperties(String file, String key) throws DiracException{
 		String contextPath = DiracConfig.class.getClassLoader()
 				.getResource("").getPath();
@@ -41,6 +69,13 @@ public class DiracConfig {
 		}else{
 			throw new DiracException("properties-file-not-found");
 		}
+	}
+
+	public String getProperties(String key) {
+		if(this.properties!=null){
+			return this.properties.getProperty(key);
+		}
+		return null;
 	}
 
 }

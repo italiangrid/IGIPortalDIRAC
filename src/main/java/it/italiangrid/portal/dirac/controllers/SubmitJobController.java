@@ -1,7 +1,11 @@
 package it.italiangrid.portal.dirac.controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.portlet.RenderRequest;
 
@@ -9,7 +13,6 @@ import it.italiangrid.portal.dbapi.domain.UserInfo;
 import it.italiangrid.portal.dbapi.domain.Vo;
 import it.italiangrid.portal.dbapi.services.UserInfoService;
 import it.italiangrid.portal.dbapi.services.UserToVoService;
-import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.db.service.JobJdlsService;
 import it.italiangrid.portal.dirac.exception.DiracException;
 import it.italiangrid.portal.dirac.model.Jdl;
@@ -90,17 +93,6 @@ public class SubmitJobController {
 		
 	}
 	
-	@ModelAttribute("sites")
-	public List<String> showSites(){
-		DiracAdminUtil util = new DiracAdminUtil();
-		try {
-			return util.getSite();
-		} catch (DiracException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
 	@ModelAttribute("showUploadCert")
 	public boolean showUploadCert(RenderRequest request){
 		
@@ -124,7 +116,7 @@ public class SubmitJobController {
 				
 				List<Vo> result = new ArrayList<Vo>();
 				for (Vo vo : vos) {
-					if(notIn(vo.getVo(), excluded))
+					if(vo.getConfigured().equals("true") && notIn(vo.getVo(), excluded))
 						result.add(vo);
 				}
 				return result;
@@ -143,10 +135,8 @@ public class SubmitJobController {
 					return vos;
 				}
 			} catch (PortalException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (SystemException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			
@@ -215,6 +205,29 @@ public class SubmitJobController {
 		
 		return false;
 		
+	}
+	
+	@ModelAttribute("voListMatch")
+	public Properties getVoListMatch() throws IOException{
+		
+		try {
+			DiracConfig diracConfig = new DiracConfig("Dirac.properties");
+			
+			String diracDir = diracConfig.getProperties("dirac.admin.homedir");
+			String resultFileName = diracConfig.getProperties("dirac.volistmatcher.list");
+			File resultFile = new File(System.getProperty("java.io.tmpdir") + "/" + diracDir + "/" + resultFileName);
+			
+			Properties properties = new Properties();
+			FileInputStream fis = new FileInputStream(resultFile);
+			properties.load(fis);
+			fis.close();
+			
+			return properties;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 }

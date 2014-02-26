@@ -49,13 +49,15 @@ public class Checker implements Runnable{
 	 * Method to backup on file the notification queue.
 	 * 
 	 * @throws IOException
+	 * @throws DiracException 
 	 */
 	public static void store() throws IOException{
 		log.info("Storing Checker queue ...\n"+queue.toString()); 
 		
 		File datFile;
 		try {
-			datFile = new File(System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.checker.store"));
+			DiracConfig diracConfig = new DiracConfig("Dirac.properties");
+			datFile = new File(System.getProperty("java.io.tmpdir") + "/" + diracConfig.getProperties("dirac.admin.homedir") + "/" + diracConfig.getProperties("dirac.checker.store"));
 		} catch (DiracException e) {
 			datFile = new File(System.getProperty("java.io.tmpdir") + "/diracAdmin/checker.dat");
 		}
@@ -87,7 +89,8 @@ public class Checker implements Runnable{
 		
 		File datFile;
 		try {
-			datFile = new File(System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.checker.store"));
+			DiracConfig diracConfig = new DiracConfig("Dirac.properties");
+			datFile = new File(System.getProperty("java.io.tmpdir") + "/" + diracConfig.getProperties("dirac.admin.homedir") + "/" + diracConfig.getProperties("dirac.checker.store"));
 		} catch (DiracException e) {
 			datFile = new File(System.getProperty("java.io.tmpdir") + "/diracAdmin/checker.dat");
 		}
@@ -198,7 +201,8 @@ public class Checker implements Runnable{
 	 */
 	private void sendMail(Notify n, List<String> status) throws DiracException {
 		
-		String from = DiracConfig.getProperties("Dirac.properties", "igiportal.mail");
+		DiracConfig diracConfig = new DiracConfig("Dirac.properties");
+		String from =  diracConfig.getProperties("igiportal.mail");
 		String mailSubject = "";
 		String mailContent = "";
 		String jobIDs = "";
@@ -206,25 +210,25 @@ public class Checker implements Runnable{
 		boolean isHtml = true;
 		if(status.size()>1){
 			
-			mailSubject = DiracConfig.getProperties("Dirac.properties", "dirac.checker.subject.multi");
+			mailSubject =  diracConfig.getProperties("dirac.checker.subject.multi");
 			
 			try {
-				mailContent = readFile(DiracConfig.getProperties("Dirac.properties", "dirac.checker.mail.multi.template"));
+				mailContent = readFile(diracConfig.getProperties("dirac.checker.mail.multi.template"));
 			} catch (IOException e) {
 				isHtml = false;
-				mailContent = DiracConfig.getProperties("Dirac.properties", "dirac.checker.mail.multi");
+				mailContent = diracConfig.getProperties("dirac.checker.mail.multi");
 			}
 			
 			
 			
 		}else{
 		
-			mailSubject = DiracConfig.getProperties("Dirac.properties", "dirac.checker.subject.single");
+			mailSubject =  diracConfig.getProperties("dirac.checker.subject.single");
 			try {
-				mailContent = readFile(DiracConfig.getProperties("Dirac.properties", "dirac.checker.mail.single.template"));
+				mailContent = readFile(diracConfig.getProperties("dirac.checker.mail.single.template"));
 			} catch (IOException e) {
 				isHtml = false;
-				mailContent = DiracConfig.getProperties("Dirac.properties", "dirac.checker.mail.single");
+				mailContent = diracConfig.getProperties("dirac.checker.mail.single");
 			}
 		
 		}
@@ -240,7 +244,7 @@ public class Checker implements Runnable{
 		mailSubject = mailSubject.replace("##JOBIDS##", jobIDs);
 		mailContent = mailContent.replace("##USER##", n.getUser());
 		mailContent = mailContent.replace("##STATUS##", jobStatus);
-		mailContent = mailContent.replace("##HOST##", DiracConfig.getProperties("Dirac.properties", "portal.home"));
+		mailContent = mailContent.replace("##HOST##", diracConfig.getProperties("portal.home"));
 		
 		SendMail sm = new SendMail(from, n.getEmail(), mailSubject, mailContent, isHtml);
 		sm.send();
@@ -258,11 +262,11 @@ public class Checker implements Runnable{
 	 * @throws SQLException
 	 */
 	private Connection openConnetion() throws DiracException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException{
-		
-		String url = DiracConfig.getProperties("../../spring.properties", "app2.jdbc.url");
-	    String driver = DiracConfig.getProperties("../../spring.properties", "app2.jdbc.driverClassName");
-	    String userName = DiracConfig.getProperties("../../spring.properties", "app2.jdbc.username");
-	    String password = DiracConfig.getProperties("../../spring.properties", "app2.jdbc.password");
+		DiracConfig diracConfig = new DiracConfig("../../spring.properties");
+		String url = diracConfig.getProperties("app2.jdbc.url");
+	    String driver = diracConfig.getProperties("app2.jdbc.driverClassName");
+	    String userName = diracConfig.getProperties("app2.jdbc.username");
+	    String password = diracConfig.getProperties("app2.jdbc.password");
 	    
 	    Class.forName(driver).newInstance();
 	    log.debug("Connected to the database");
