@@ -7,8 +7,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Properties;
 
+import it.italiangrid.portal.dirac.admin.DiracAdminUtil;
 import it.italiangrid.portal.dirac.util.DiracConfig;
 
 import org.apache.log4j.Logger;
@@ -40,20 +42,17 @@ public class VoListMatcher implements Runnable {
 			DiracConfig diracConfig = new DiracConfig("Dirac.properties");
 			
 			String scriptName = diracConfig.getProperties("dirac.volistmatcher.script");
-			log.info("Script name: " + scriptName);
-			String voListString = diracConfig.getProperties("dirac.configuredVo");
-			log.info(voListString);
-			String[] voList = voListString.split(";");
-			
 			String diracDir = diracConfig.getProperties("dirac.admin.homedir");
 			String resultFileName = diracConfig.getProperties("dirac.volistmatcher.list");
 			File workingDir = new File(System.getProperty("java.io.tmpdir") + "/" + diracDir); 
 			File resultFile = new File(System.getProperty("java.io.tmpdir") + "/" + diracDir + "/" + resultFileName);
 			
+			DiracAdminUtil util = new DiracAdminUtil();
+			List<String> voList = util.getVo();
+			
 			Properties resultData = new Properties();
 			
 			for (String vo : voList) {
-				
 				getList(scriptName, workingDir, resultData, vo);
 			}
 			

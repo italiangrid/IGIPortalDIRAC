@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -336,6 +337,40 @@ public class DiracAdminUtil {
 		log.info("Sites: " + result);
 		
 		return result;
+		
+	}
+	
+	public List<String> getVo() throws DiracException {
+		List<String> outputs = new ArrayList<String>();
+		
+		
+		File exeDir = new File(System.getProperty("java.io.tmpdir") + "/" + DiracConfig.getProperties("Dirac.properties", "dirac.admin.homedir"));
+		
+		String[] cmd = { "/usr/bin/python", "dirac-get-vo.py"};
+		
+		log.info("Execute command: " + cmd);
+		
+		try {
+			execute(cmd, exeDir, outputs);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new DiracException("error-retrieving-sites");
+		}
+		
+		List<String> voList = new ArrayList<String>();
+		
+		for (String line : outputs) {
+			if(line.contains("Registry/VO/")){
+				line = line.split("#")[0];
+				line = line.replace("Registry/VO/", "");
+				line = line.replaceAll(" ", "");
+				voList.add(line);
+			}
+		}
+		
+		log.info("VOs: " + voList);
+		
+		return voList;
 		
 	}
 }
