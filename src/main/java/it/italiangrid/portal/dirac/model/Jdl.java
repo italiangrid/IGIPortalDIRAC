@@ -633,7 +633,7 @@ public class Jdl {
 		if (myProxyServer != null && !myProxyServer.isEmpty()) {
 			string += "MyProxyServer = \"" + myProxyServer + "\";\n";
 		}
-		if (site != null && !site.isEmpty() && !site.equals("ANY")) {
+		if (site != null && !site.isEmpty() && !site.equals("LCG.ANY.it")) {
 			string += "Site = \"" + site + "\";\n";
 		}
 		string+="\n";
