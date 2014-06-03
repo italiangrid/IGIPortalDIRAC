@@ -149,6 +149,39 @@
 		});
 	}
 	
+	function resetSite(){
+		$("#selectSite ").val('LCG.ANY.it');
+		var html = "Site Selected: <br/>ANY";
+		$("#displaySite").html(html);
+		
+	}
+	
+	function updateSite(){
+		
+		//get values from #selectSite
+		var site = $("#selectSite ").val() || [];
+		var htmlString = "Site Selected: <br/>";
+		
+		//htmlString = htmlString.join(", ");
+		
+		//alert(site);
+		
+		if(site.length==0){
+			htmlString = "Site Selected: <br/>ANY";
+		}
+		
+		//update values on #displaySite
+		
+		var html = htmlString+site
+		html = html.replace(/,/g, '<br />');
+		
+		if(html.indexOf("ANY") > -1){
+			resetSite();
+		}else{
+			$("#displaySite").html(html);
+		}
+	}
+	
 	$(document).ready(function() {
 		appendExecutable();
 		$('#template_table').dataTable();
@@ -482,7 +515,7 @@
 						
 						<div style="float: left;">
 							<label for="selectSite"><strong>Site</strong></label><br/>
-							<select id="selectSite" name="site">
+							<select id="selectSite" name="site" multiple onchange="updateSite()">
 						
 							<c:set var="sitesList" value="${fn:split(voListMatch[defaultVo], ';') }"/>
 							<c:forEach var="site" items="${sitesList }">
@@ -496,8 +529,10 @@
 						
 							</select>
 						</div>
+						
+						<div id="displaySite" style="float: left; margin-top: 15px; padding: 5px; margin-left: 4px; min-width:50px; border: dotted 1px grey; ">Site Selected:<br/>ANY</div>
 						<div style="float: left; margin-top: 20px; margin-left: 4px;">
-							<a href="#addFile" onclick="$('#sitesDiv').hide(); $('#sitesadd').show(); $('#sitesremove').hide(); $('#sitesDiv select').val('ANY')"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /></a>
+							<a href="#addFile" onclick="$('#sitesDiv').hide(); $('#sitesadd').show(); $('#sitesremove').hide(); resetSite();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /></a>
 						</div>
 						<div style="clear: both;"></div>
 					</div>
@@ -603,7 +638,7 @@
 					</div>
 					<div>
 					<a id="sitesadd" href="#sitesDiv" onclick="$('#sitesDiv').show(); setTimeout( function() { $('#sitesDiv input').focus(); }, 200 ); $('#sitesremove').show(); $('#sitesadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Sites</a>
-					<a id="sitesremove" style="display: none;" href="#sitesDiv" onclick="$('#sitesDiv').hide(); $('#sitesadd').show(); $('#sitesremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Sites</a>
+					<a id="sitesremove" style="display: none;" href="#sitesDiv" onclick="$('#sitesDiv').hide(); $('#sitesadd').show(); $('#sitesremove').hide(); resetSite();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Sites</a>
 					</div>
 				</aui:fieldset>	
 			</div>
