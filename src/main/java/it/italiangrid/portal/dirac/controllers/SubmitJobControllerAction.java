@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -175,30 +176,34 @@ public class SubmitJobControllerAction {
 					                
 					             }
 		            	} else{
-			            	String value = uploadRequest.getParameter(parameter);
-			            	log.info(parameter +" = "+value);
-			            	if(parameter.contains("executable")||parameter.contains("uploadedFile_")){
-			            		File check = new File(path + "/" + value);
-			            		
-			            		if(check.exists()){
-			            			log.info("Fonunded file: " + path+"/"+value);
-			            			inputSandbox.add(path+"/"+value);
-			            			log.info("File " + value + " inserted.");
-			            		}
-			            		if(parameter.contains("executable")){
-			            			
-							        if(!value.startsWith("/"))
-							        	needsWrapper=true;
-							        
-							        jdl.setParameter(parameter, value);
-			            		}
-			            	}else{
-//			            		if(parameter.equals("arguments")){
-//			            			value = value.replaceAll("(\\r|\\n)", " ");
-//			            		}
-			            		jdl.setParameter(parameter, value);
-			            		
-			            	}
+		            		if(parameter.contains("site")){
+		            			String[] tmp = uploadRequest.getParameterValues(parameter);
+		            			List<String> sites = Arrays.asList(tmp);
+		            			log.info("Site = " + sites);
+		            			jdl.setSite(sites);
+		            		}else{
+				            	String value = uploadRequest.getParameter(parameter);
+				            	log.info(parameter +" = "+value);
+				            	if(parameter.contains("executable")||parameter.contains("uploadedFile_")){
+				            		File check = new File(path + "/" + value);
+				            		
+				            		if(check.exists()){
+				            			log.info("Fonunded file: " + path+"/"+value);
+				            			inputSandbox.add(path+"/"+value);
+				            			log.info("File " + value + " inserted.");
+				            		}
+				            		if(parameter.contains("executable")){
+				            			
+								        if(!value.startsWith("/"))
+								        	needsWrapper=true;
+								        
+								        jdl.setParameter(parameter, value);
+				            		}
+				            	}else{
+				            		jdl.setParameter(parameter, value);
+				            		
+				            	}
+		            		}
 		            	}
 		            }
 		        }
@@ -226,8 +231,6 @@ public class SubmitJobControllerAction {
 			        	newIS.addAll(inputSandbox);
 			        }
 					inputSandbox = newIS;
-					
-					
 					
 //					File wrapperFile = new File(wrapperPath);
 					

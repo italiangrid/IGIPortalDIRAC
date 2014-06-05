@@ -55,7 +55,7 @@ public class Jdl {
 	private String vo;
 	private String requirements;
 	private String myProxyServer;
-	private String site;
+	private List<String> site;
 	private List<String> parameterNames = Arrays.asList(new String[]{ "jobName", "executable", "arguments",
 		"inputSandbox", "outputSandboxRequest", "outputSandbox", "outputSandboxDestUri", "stdOutput", "stdError",
 		"inputData", "outputSE", "outputData", "outputPath", "parameters", "parameterStart",
@@ -485,14 +485,14 @@ public class Jdl {
 	/**
 	 * @return the site
 	 */
-	public String getSite() {
+	public List<String> getSite() {
 		return site;
 	}
 
 	/**
 	 * @param site the site to set
 	 */
-	public void setSite(String site) {
+	public void setSite(List<String> site) {
 		this.site = site;
 	}
 
@@ -608,12 +608,11 @@ public class Jdl {
 						string += "\"" + s + "\",";
 					}
 	
-					string = string.substring(0, string.length() - 2);
+					string = string.substring(0, string.length() - 1);
 	
 					string += "};\n";
 				}
 			}
-			string += "OutputSE = \"" + outputSE + "\";\n";
 		}
 		if (cpuNumber != null && !cpuNumber.isEmpty()) {
 			string += "CPUNumber = " + cpuNumber + ";\n";
@@ -633,8 +632,24 @@ public class Jdl {
 		if (myProxyServer != null && !myProxyServer.isEmpty()) {
 			string += "MyProxyServer = \"" + myProxyServer + "\";\n";
 		}
-		if (site != null && !site.isEmpty() && !site.equals("LCG.ANY.it")) {
-			string += "Site = \"" + site + "\";\n";
+//		if (site != null && !site.isEmpty() && !site.equals("LCG.ANY.it")) {
+//			string += "Site = \"" + site + "\";\n";
+//		}
+		if (site != null && !site.isEmpty()){
+			if(site.size()>1){
+				string += "Site = {";
+				for (String s : site) {
+					string += "\"" + s + "\",";
+				}
+
+				string = string.substring(0, string.length() - 1);
+
+				string += "};\n";
+			}else{
+				if (!site.equals("LCG.ANY.it")) {
+					string += "Site = \"" + site.get(0) + "\";\n";
+				}
+			}
 		}
 		string+="\n";
 		return string;
@@ -668,7 +683,7 @@ public class Jdl {
 		case 21: this.requirements = (String) value; break;
 		case 22: this.myProxyServer = (String) value; break;
 		case 23: this.path = (String) value; break;
-		case 24: this.site = (String) value; break;
+//		case 24: this.site = (String) value; break;
 		}
 	}
 	public void copyJob(JobJdls diracJdl, long userId) throws DiracException, IOException {
@@ -741,7 +756,7 @@ public class Jdl {
 			if(row != null){
 				if(!row.contains("JobRequirements")){
 
-					log.info(key + " fuounded with value : " + row);
+					log.info(key + " founded with value : " + row);
 					String value = row.replaceAll(key, "");
 					
 					value = value.substring(value.indexOf("=")+2, value.length()-2);
@@ -772,11 +787,26 @@ public class Jdl {
 						}
 						
 						break;
+					case 24: /* Sites */
+						if(value.contains("{")&&value.contains("}")){
+							value= value.replaceAll("\"", "");
+							value= value.replace("{", "");
+							value= value.replace("}", "");
+							values = value.split(",");
+							this.site = Arrays.asList(values);
+						} else {
+							List<String> result = new ArrayList<String>();
+							result.add(value.replaceAll("\"", ""));
+							this.site = result;
+						}
+						break;
 					case 1: /* Executable */
 						value= value.replaceAll("\"", "");
 						if(value.equals(DiracConfig.getProperties("Dirac.properties", "dirac.wrapper.script"))){
 							haveWrapper = true;
 						}
+					
+						
 					default:
 						if(value.contains("{")&&value.contains("}")){
 							value= value.replaceAll("\"", "");

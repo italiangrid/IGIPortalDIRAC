@@ -147,6 +147,52 @@
 		list.forEach(function(entry) {
 		    $("#selectSite").append("<option value=\"LCG." + entry + ".it\">" + entry + "</option>");
 		});
+		selectSite();
+	}
+	
+	function resetSite(){
+		$("#selectSite ").val('LCG.ANY.it');
+		var html = "<strong>Site Selected:</strong><br/>ANY";
+		$("#displaySite").html(html);
+		
+	}
+	
+	function updateSite(){
+		
+		//get values from #selectSite
+		var site = $("#selectSite ").val() || [];
+		var htmlString = "<strong>Site Selected:</strong><br/>";
+		
+		//htmlString = htmlString.join(", ");
+		
+		//alert(site);
+		
+		if(site.length==0){
+			htmlString = htmlString + "ANY";
+		}
+		
+		//update values on #displaySite
+		
+		var html = htmlString+site
+		html = html.replace(/,/g, '<br />');
+		
+		if(html.indexOf("ANY") > -1){
+			resetSite();
+		}else{
+			$("#displaySite").html(html);
+		}
+	}
+	
+	function selectSite(){
+		
+		var sites = new Array();
+		
+		<c:forEach var="item" items="${jdl.site }">
+			sites.push("${item}");
+		</c:forEach>
+		
+		$("#selectSite ").val(sites);
+		updateSite();
 	}
 	
 	$(document).ready(function() {
@@ -486,22 +532,19 @@
 						
 						<div style="float: left;">
 							<label for="selectSite"><strong>Site</strong></label><br/>
-							<select id="selectSite" name="site">
+							<select id="selectSite" name="site" multiple onchange="updateSite()">
 						
 							<c:set var="sitesList" value="${fn:split(voListMatch[defaultVo], ';') }"/>
 							<c:forEach var="site" items="${sitesList }">
-								<c:if test="${site == jdl.site }">
-									<option selected="true" value="LCG.${site }.it">${site }</option>
-								</c:if>
-								<c:if test="${site != jdl.site }">
-									<option value="LCG.${site }.it">${site }</option>
-								</c:if>
+								<option value="LCG.${site }.it">${site }</option>
 							</c:forEach>
 						
 							</select>
 						</div>
+						
+						<div id="displaySite" style="float: left; margin-top: 15px; padding: 5px; margin-left: 4px; min-width:50px; border: dotted 1px grey; "></div>
 						<div style="float: left; margin-top: 20px; margin-left: 4px;">
-							<a href="#addFile" onclick="$('#sitesDiv').hide(); $('#sitesadd').show(); $('#sitesremove').hide(); $('#sitesDiv select').val('ANY')"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /></a>
+							<a href="#addFile" onclick="$('#sitesDiv').hide(); $('#sitesadd').show(); $('#sitesremove').hide(); resetSite();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /></a>
 						</div>
 						<div style="clear: both;"></div>
 					</div>
@@ -607,7 +650,7 @@
 					</div>
 					<div>
 					<a id="sitesadd" href="#sitesDiv" onclick="$('#sitesDiv').show(); setTimeout( function() { $('#sitesDiv input').focus(); }, 200 ); $('#sitesremove').show(); $('#sitesadd').hide();"><img src="<%=request.getContextPath()%>/images/NewAdd.png" width="14" height="14" /> Sites</a>
-					<a id="sitesremove" style="display: none;" href="#sitesDiv" onclick="$('#sitesDiv').hide(); $('#sitesadd').show(); $('#sitesremove').hide();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Sites</a>
+					<a id="sitesremove" style="display: none;" href="#sitesDiv" onclick="$('#sitesDiv').hide(); $('#sitesadd').show(); $('#sitesremove').hide(); resetSite();"><img src="<%=request.getContextPath()%>/images/NewDelete.png" width="14" height="14" /> Sites</a>
 					</div>
 				</aui:fieldset>	
 			</div>
@@ -688,10 +731,13 @@
 		$('#requirementsadd').hide();
 	}
 
-	if("${jdl.site }"!=""){
-		$("#sitesDiv").show();
-		$('#sitesremove').show(); 
-		$('#sitesadd').hide();
+	if("${jdl.site.size() > 0}" == "true"){
+		if(!("${jdl.site.size() == 1}" == "true" && "${jdl.site[0] }" == "LCG.ANY.it")){
+			selectSite();
+			$("#sitesDiv").show();
+			$('#sitesremove').show(); 
+			$('#sitesadd').hide();
+		}
 	}
 	if("${jdl.outputSandboxRequest }"!=""){
 		$("#outputSandboxDiv").show();
