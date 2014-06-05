@@ -197,7 +197,11 @@
 	
 	$(document).ready(function() {
 		appendExecutable();
-		$('#template_table').dataTable();
+		$('#template_table').dataTable({
+	        "paging":   false,
+	        "ordering": false,
+	        "info":     false
+	    });
 		//appendInputSandbox();
 		});
 </script>
