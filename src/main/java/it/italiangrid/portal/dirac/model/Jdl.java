@@ -756,7 +756,7 @@ public class Jdl {
 			if(row != null){
 				if(!row.contains("JobRequirements")){
 
-					log.info(key + " fuounded with value : " + row);
+					log.info(key + " founded with value : " + row);
 					String value = row.replaceAll(key, "");
 					
 					value = value.substring(value.indexOf("=")+2, value.length()-2);
@@ -787,12 +787,6 @@ public class Jdl {
 						}
 						
 						break;
-					case 1: /* Executable */
-						value= value.replaceAll("\"", "");
-						if(value.equals(DiracConfig.getProperties("Dirac.properties", "dirac.wrapper.script"))){
-							haveWrapper = true;
-						}
-						
 					case 24: /* Sites */
 						if(value.contains("{")&&value.contains("}")){
 							value= value.replaceAll("\"", "");
@@ -802,10 +796,16 @@ public class Jdl {
 							this.site = Arrays.asList(values);
 						} else {
 							List<String> result = new ArrayList<String>();
-							result.add(value);
+							result.add(value.replaceAll("\"", ""));
 							this.site = result;
 						}
 						break;
+					case 1: /* Executable */
+						value= value.replaceAll("\"", "");
+						if(value.equals(DiracConfig.getProperties("Dirac.properties", "dirac.wrapper.script"))){
+							haveWrapper = true;
+						}
+					
 						
 					default:
 						if(value.contains("{")&&value.contains("}")){
