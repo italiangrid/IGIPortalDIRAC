@@ -646,7 +646,7 @@ public class Jdl {
 
 				string += "};\n";
 			}else{
-				if (!site.equals("LCG.ANY.it")) {
+				if (!site.get(0).equals("LCG.ANY.it")) {
 					string += "Site = \"" + site.get(0) + "\";\n";
 				}
 			}
